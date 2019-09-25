@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Swiss Wutan's Unique Centralized Calendar Everyone Ever Wished We Had But Never Dared to Ask For</title>
+	<meta charset="utf-8" />
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="vue_inject.js"></script>
+	<script async defer src="https://apis.google.com/js/api.js"></script>
+</head>
+
+<body>
+	<div id="app">
+		<div class='authentification'>
+			<h2>Back office</h2>
+			Authentification
+			<button v-if='!authorized' @click="handleAuthClick">Sign In</button>
+			<button v-if='authorized' @click="handleSignoutClick">Sign Out</button>
+		</div>
+		<hr>
+		<div >
+			<button @click="refreshAll">Refresh</button>
+		</div>
+		<div>
+			<h3>Scheduled events</h3>{{ events }}
+			<h3>Proposed events</h3>{{ proposedEvents }}
+			<button v-if='authorized' @click="validateEvents">Validate proposed events</button>
+		</div>
+	</div>
+</body>
+
+</html>
