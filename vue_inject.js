@@ -31,7 +31,7 @@ window.onload = function () {
        *  On load, called to load the auth2 library and API client library.
        */
 			handleClientLoad() {
-				this.api.load('client:auth2', this.initClient);
+				this.api.load('client:auth2', this.initClient)
 			},
 
       /**
@@ -49,7 +49,7 @@ window.onload = function () {
 				}).then(_ => {
 					// Listen for sign-in state changes.
 					vm.api.auth2.getAuthInstance().isSignedIn.listen(vm.authorized);
-				});
+				}).then(() => this.refreshAll())
 			},
 
       /**

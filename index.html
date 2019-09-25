@@ -18,14 +18,13 @@
 			<button v-if='authorized' @click="handleSignoutClick">Sign Out</button>
 		</div>
 		<hr>
-		<div >
-			<button @click="refreshAll">Refresh</button>
-		</div>
 		<div>
 			<h3>Scheduled events</h3>{{ events }}
 			<h3>Proposed events</h3>{{ proposedEvents }}
 			<button v-if='authorized' @click="validateEvents">Validate proposed events</button>
 		</div>
+		<br />
+		<iframe src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;mode=AGENDA&amp;showTz=0&amp;showCalendars=0&amp;showTabs=1&amp;showPrint=0&amp;showDate=1&amp;showNav=1&amp;showTitle=1&amp;title=Swiss%20Wutan%20All%20Schools%20Agenda" style="border-width:0" width="793" height="600" frameborder="0" scrolling="no"></iframe>
 	</div>
 </body>
 
