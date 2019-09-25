@@ -138,28 +138,27 @@
       // stored credentials.
 
     function addTest() {
-        //gapi.client.load('calendar', 'v3', function() {
-            var event = {
-                'summary': 'Swiss Wutan First',
-                'description': 'Nouvel événement Swiss Wutan',
-                'start': {
-                    'dateTime': '2019-09-26T09:00:00-07:00',
-                    'timeZone': 'Europe/Zurich'
-                },
-                'end': {
-                    'dateTime': '2019-09-26T17:00:00-07:00',
-                    'timeZone': 'Europe/Zurich'
-                }
-            };
-            var request = gapi.client.calendar.events.insert({
-                'calendarId': CALENDAR_ID,
-                'resource': event
-            });
-            request.execute(function(event) {
-                appendPre('Event created: ' + JSON.stringify(event));
-            });
-        //})
-    }
+        var event = {
+		'summary': 'Swiss Wutan First',
+		'description': 'Nouvel événement Swiss Wutan',
+		'start': {
+			'dateTime': '2019-09-26T09:00:00-07:00',
+			'timeZone': 'Europe/Zurich'
+		},
+		'end': {
+			'dateTime': '2019-09-26T17:00:00-07:00',
+			'timeZone': 'Europe/Zurich'
+		}
+		};
+		var request = gapi.client.calendar.events.insert({
+			'calendarId': CALENDAR_ID,
+			'resource': event
+		});
+		request.execute(function(event) {
+			appendPre('Event created: ' + JSON.stringify(event));
+				});
+			//})
+		}
 
 	</script>
 
