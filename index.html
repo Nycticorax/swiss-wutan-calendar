@@ -45,7 +45,7 @@
 						<v-card-text>These two horizontal tabs allow you to switch between events submitted but not yet
 							validated (i.e. accepted or rejected) and events already scheduled events.</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
-							<v-tabs v-model="active_tab" vertical>
+							<v-tabs color="red darken-2" v-model="active_tab" vertical>
 								<v-tab key="0">Proposed events</v-tab>
 								<v-tab key="1">Scheduled events</v-tab>
 								<!-- SUBMITTED EVENTS -->
@@ -111,10 +111,14 @@
 							</v-tabs>
 						</v-card>
 						<v-card-actions>
-							<v-btn v-if="authorized && selectedProposedEvents.length > 0" @click="validateEvents(true)">Accept proposed event(s)</v-btn>
-							<v-btn v-else-if='authorized' @click="validateEvents(true)" disabled>Accept proposed event(s)</v-btn>
-							<v-btn v-if="authorized && selectedProposedEvents.length > 0" @click="validateEvents(false)">Reject proposed event(s)</v-btn>
-							<v-btn v-else-if='authorized' @click="validateEvents(false)" disabled>Reject proposed event(s)</v-btn>
+							<v-btn v-if="authorized && selectedProposedEvents.length > 0" @click="validateEvents(true)">
+								Accept proposed event(s)</v-btn>
+							<v-btn v-else-if='authorized' @click="validateEvents(true)" disabled>Accept proposed
+								event(s)</v-btn>
+							<v-btn v-if="authorized && selectedProposedEvents.length > 0"
+								@click="validateEvents(false)">Reject proposed event(s)</v-btn>
+							<v-btn v-else-if='authorized' @click="validateEvents(false)" disabled>Reject proposed
+								event(s)</v-btn>
 						</v-card-actions>
 					</v-card>
 				</v-container>
