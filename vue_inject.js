@@ -39,7 +39,7 @@ window.onload = function () {
 					v => !!v || 'Phone number is required',
 					v => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(v.trim()) || 'Phone number must be valid',
 				],
-				schools_opts: ['Basel','Bern','Biel','Fribourg','Thun'],
+				schools_opts: ['Basel', 'Bern', 'Biel', 'Fribourg', 'Thun'],
 				// author
 				dates: [],
 				refDate: new Date().toISOString().substr(0, 10),
@@ -50,7 +50,7 @@ window.onload = function () {
 					email: '',
 					phone: '',
 					is_school: null,
-					school:''
+					school: ''
 				},
 				// event
 				event: {
@@ -65,11 +65,11 @@ window.onload = function () {
 					discount: null,
 					registration: null,
 					registration_details: '',
-					comment:'',
+					comment: '',
 				},
-				arts_opts:['Bagua', 'Baji', 'Tai chi', 'Kung Fu', 'Mizongyi', 'Xing Yi'],
+				arts_opts: ['Bagua', 'Baji', 'Tai chi', 'Kung Fu', 'Mizongyi', 'Xing Yi'],
 				levels_opts: ['Beginners', 'Advanced'],
-				fillFrom_opts: ['fill from email','fill from phone', 'fill from school']
+				fillFrom_opts: ['fill from email', 'fill from phone', 'fill from school']
 			}
 		},
 
@@ -79,8 +79,8 @@ window.onload = function () {
 		},
 
 		computed: {
-			thisMonthEvents(){
-				return this.events.filter(e => this.refDate.substr(0,7) == e.start.dateTime.substr(0,7))
+			thisMonthEvents() {
+				return this.events.filter(e => this.refDate.substr(0, 7) == e.start.dateTime.substr(0, 7))
 			}
 		},
 
@@ -181,10 +181,10 @@ window.onload = function () {
 							'summary': e.summary,
 							'description': e.description,
 							'location': e.location,
-							'start': {'dateTime': e.start.dateTime},
-							'end': {'dateTime:': e.end.dateTime}
+							'start': { 'dateTime': e.start.dateTime },
+							'end': { 'dateTime:': e.end.dateTime }
 						}
-					})	
+					})
 				});
 
 			},
