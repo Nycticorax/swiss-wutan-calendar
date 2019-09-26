@@ -18,7 +18,7 @@
 				<v-container>
 					<v-card>
 						<v-toolbar flat color="primary" dark>
-							<v-toolbar-title>Authenticate</v-toolbar-title>
+							<v-toolbar-title>Authenticate on Google Calendar</v-toolbar-title>
 						</v-toolbar>
 							<v-card-actions>
 								<v-btn v-if='!authorized' @click="handleAuthClick">Log in</v-btn>
@@ -30,7 +30,7 @@
 				<v-container>
 					<v-card>
 						<v-toolbar flat color="primary" dark>
-							<v-toolbar-title>Accept events</v-toolbar-title>
+							<v-toolbar-title>Accept or reject events submissions</v-toolbar-title>
 						</v-toolbar>
 						<v-tabs v-model="active_tab" vertical>
 							<v-tab key='"0"'>Proposed events</v-tab>
@@ -47,7 +47,8 @@
 							</v-tab-item>
 						</v-tabs>
 						<v-card-actions>
-							<v-btn v-if='authorized' @click="validateEvents">Accept proposed events</v-btn>
+							<v-btn v-if='authorized' @click="validateEvents(true)">Accept proposed event(s)</v-btn>
+							<v-btn v-if='authorized' @click="validateEvents(false)">Reject proposed event(s)</v-btn>
 						</v-card-actions>
 					</v-card>
 				</v-container>
@@ -56,11 +57,26 @@
 						<v-toolbar flat color="primary" dark>
 							<v-toolbar-title>Check the results</v-toolbar-title>
 						</v-toolbar>
-						<v-card-text>Google Calendar doesn't accept live updates :( Please reload the page to
-							refresh</v-card-text>
-						<iframe
+						<v-card-text>Google Calendar doesn't accept live updates :( Please <v-btn @click="refresh">reload</v-btn> to
+							see the results.</v-card-text>
+						<div :key="iframe_key">
+							<iframe
 							src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;mode=AGENDA&amp;showTz=0&amp;showCalendars=0&amp;showTabs=1&amp;showPrint=0&amp;showDate=1&amp;showNav=1&amp;showTitle=1&amp;title=Swiss%20Wutan%20All%20Schools%20Agenda"
-							style="border-width:0" margin-left="auto" margin-right="auto" width="793" height="600" frameborder="0" scrolling="no"></iframe>
+							style="border-width:10" margin-left="12" width="900" height="300" frameborder="0" scrolling="no"></iframe>
+						</div>
+					</v-card>
+				</v-container>
+				<v-container>
+					<v-card>
+						<v-toolbar flat color="primary" dark>
+							<v-toolbar-title>Submit new events</v-toolbar-title>
+						</v-toolbar>
+						<v-card-text>To be validated as above.</v-card-text>
+						<v-date-picker
+							v-model="date1"
+							:events="arrayEvents"
+							event-color="green lighten-1"
+						></v-date-picker>
 					</v-card>
 				</v-container>
 			</v-content>

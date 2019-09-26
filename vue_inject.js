@@ -19,12 +19,25 @@ window.onload = function () {
 				events: undefined,
 				proposedEvents: undefined,
 				active_tab: 0,
+				iframe_key: 0,
+				arrayEvents: null,
+			    date1: new Date().toISOString().substr(0, 10),
+      			date2: new Date().toISOString().substr(0, 10),
 			}
 		},
 
 		created() {
 			this.api = gapi;
 			this.handleClientLoad();
+		},
+
+		mounted() {
+			this.arrayEvents = [...Array(6)].map(() => {
+				const day = Math.floor(Math.random() * 30)
+				const d = new Date()
+				d.setDate(day)
+				return d.toISOString().substr(0, 10)
+			})
 		},
 
 		methods: {
@@ -76,7 +89,12 @@ window.onload = function () {
 					});
 			},
 
-			validateEvents() {
+			validateEvents(verdict) {
+				if (!verdict) {
+					console.log('Denied!')
+					return
+				}
+
 				let vm = this
 
 				this.proposedEvents.forEach(e => {
@@ -99,7 +117,7 @@ window.onload = function () {
 					'description': 'Running tests is boring but necessary',
 					'start': {
 						'dateTime': '2019-09-29T09:00:00-07:00',
-						'timeZone': 'America/Los_Angeles'
+						'timeZone': 'Europe/Zurich'
 					},
 					'end': {
 						'dateTime': '2019-09-29T17:00:00-07:00',
@@ -136,6 +154,10 @@ window.onload = function () {
 					this.events = res
 				});
 			
+			},
+
+			refresh(){
+				this.iframe_key += 1;
 			}
 		}
 	});
