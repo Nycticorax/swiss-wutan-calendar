@@ -21,8 +21,31 @@ window.onload = function () {
 				active_tab: 0,
 				iframe_key: 0,
 				arrayEvents: null,
-			    date1: new Date().toISOString().substr(0, 10),
-      			date2: new Date().toISOString().substr(0, 10),
+				date1: new Date().toISOString().substr(0, 10),
+				date2: new Date().toISOString().substr(0, 10),
+				// form
+				valid: true,
+				firstName: '',
+				lastName: '',
+				firstNameRules: [
+					v => !!v || 'Name is required',
+					v => (v && v.length <= 25) || 'Name must be less than 10 characters',
+				],
+				lastNameRules: [
+					v => !!v || 'Name is required',
+					v => (v && v.length <= 25) || 'Name must be less than 10 characters',
+				],
+				email: '',
+				emailRules: [
+					v => !!v || 'E-mail is required',
+					v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+				],
+				phoneRules: [
+					v => !!v || 'Phone number is required',
+					v => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(v.trim()) || 'Phone number must be valid',
+				],
+				is_school: null,
+				schoolName: '',
 			}
 		},
 
@@ -41,17 +64,12 @@ window.onload = function () {
 		},
 
 		methods: {
-      /**
-       *  On load, called to load the auth2 library and API client library.
-       */
+			//On load, called to load the auth2 library and API client library.
 			handleClientLoad() {
 				this.api.load('client:auth2', this.initClient)
 			},
 
-      /**
-       *  Initializes the API client library and sets up sign-in state
-       *  listeners.
-       */
+			// Initializes the API client library and sets up sign-in state listeners.
 			initClient() {
 				let vm = this;
 
@@ -69,9 +87,7 @@ window.onload = function () {
 				})
 			},
 
-      /**
-       *  Sign in
-       */
+			// Sign in
 			handleAuthClick(event) {
 				Promise.resolve(this.api.auth2.getAuthInstance().signIn())
 					.then(_ => {
@@ -79,16 +95,14 @@ window.onload = function () {
 					});
 			},
 
-      /**
-       *  Sign out
-       */
+			// Sign out
 			handleSignoutClick(event) {
 				Promise.resolve(this.api.auth2.getAuthInstance().signOut())
 					.then(_ => {
 						this.authorized = false;
 					});
 			},
-
+			// Accept or reject events
 			validateEvents(verdict) {
 				if (!verdict) {
 					console.log('Denied!')
@@ -106,11 +120,12 @@ window.onload = function () {
 						this.pullScheduled()
 						this.proposedEvents = undefined
 						this.active_tab = 1
-					});	
+					});
 				});
 			},
 
-			pullProposed(){
+			// Pull proposed events (from Firebase eventually)
+			pullProposed() {
 				this.proposedEvents = [{
 					'summary': 'Swiss Wutan Mock Event',
 					'location': 'Wudang Mountains',
@@ -126,6 +141,7 @@ window.onload = function () {
 				}]
 			},
 
+			// Fetch events from Calendar API
 			pullScheduled() {
 				let vm = this;
 
@@ -141,24 +157,42 @@ window.onload = function () {
 					let res = []
 					if (events.length > 0) {
 						for (i = 0; i < events.length; i++) {
-						  var event = events[i];
-						  var when = event.start.dateTime;
-						  if (!when) {
-							when = event.start.date;
-						  }
-						  res.push(event.summary + ' (' + when + ')')
+							var event = events[i];
+							var when = event.start.dateTime;
+							if (!when) {
+								when = event.start.date;
+							}
+							res.push(event.summary + ' (' + when + ')')
 						}
-					  } else {
+					} else {
 						res.push('No upcoming events found.');
-					  }
+					}
 					this.events = res
 				});
-			
+
 			},
 
-			refresh(){
+			// Little hack for iframe component refresh
+			refreshFrame() {
 				this.iframe_key += 1;
-			}
+			},
+
+			// Form validation & reset
+			validate() {
+				if (this.$refs.form.validate()) {
+					this.snackbar = true
+				}
+			},
+
+			reset() {
+				this.$refs.form.reset()
+			},
+
+			resetValidation() {
+				this.$refs.form.resetValidation()
+			},
+
+
 		}
 	});
 }

@@ -17,35 +17,49 @@
 			<v-content>
 				<v-container>
 					<v-card>
-						<v-toolbar flat color="primary" dark>
+						<v-toolbar flat color="red darken-2" dark>
 							<v-toolbar-title>Authenticate on Google Calendar</v-toolbar-title>
 						</v-toolbar>
+						<v-card-text>Hello and welcome. Couple of words to explain how this page works. If you have
+								something like an "admin" role in Swiss Wutan (i.e. Sergej), you can use this little web
+								app to manage EVENTS SUBMISSIONS. The idea is that anyone -- perhaps an individual or
+								institutional member from Swiss Wutan, but not necessarily -- can submit events to the
+								SWISS WUTAN CALENDAR -- displayed here below. By contrast, only people vested with an
+								"admin" role can accept or reject events submissions. This process is explained below.
+								At the end of the day this removes all the bureaucratic shenanigans so that we can all
+								focus on what matters -- <em>Wutan!</em>
+						</v-card-text>
+						<v-card class="d-flex pa-2" outlined tile>
 							<v-card-actions>
 								<v-btn v-if='!authorized' @click="handleAuthClick">Log in</v-btn>
 								<v-btn v-if='authorized' @click="handleSignoutClick">Log out</v-btn>
-								<v-card-text>Required to validate events.</v-card-text>
-							</v-card-actions>
+						</v-card-actions>
+						</v-card>
 					</v-card>
 				</v-container>
 				<v-container>
 					<v-card>
-						<v-toolbar flat color="primary" dark>
+						<v-toolbar flat color="red darken-2" dark>
 							<v-toolbar-title>Accept or reject events submissions</v-toolbar-title>
 						</v-toolbar>
-						<v-tabs v-model="active_tab" vertical>
-							<v-tab key='"0"'>Proposed events</v-tab>
-							<v-tab key='"1"'>Scheduled events</v-tab>
-							<v-tab-item key='"0"'>
-								<v-card flat>
-									<v-card-text>{{ proposedEvents }}</v-card-text>
-								</v-card>
-							</v-tab-item>
-							<v-tab-item key='"1"'>
-								<v-card flat>
-									<v-card-text>{{ events }}</v-card-text>
-								</v-card>
-							</v-tab-item>
-						</v-tabs>
+						<v-card-text>These two horizontal tabs allow you to switch between events proposed but not yet
+							validated (i.e. accepted or rejected) and events already scheduled events.</v-card-text>
+						<v-card class="d-flex pa-2" outlined tile>
+							<v-tabs v-model="active_tab" vertical>
+								<v-tab key='"0"'>Proposed events</v-tab>
+								<v-tab key='"1"'>Scheduled events</v-tab>
+								<v-tab-item key='"0"'>
+									<v-card flat>
+										<v-card-text>{{ proposedEvents }}</v-card-text>
+									</v-card>
+								</v-tab-item>
+								<v-tab-item key='"1"'>
+									<v-card flat>
+										<v-card-text>{{ events }}</v-card-text>
+									</v-card>
+								</v-tab-item>
+							</v-tabs>
+						</v-card>
 						<v-card-actions>
 							<v-btn v-if='authorized' @click="validateEvents(true)">Accept proposed event(s)</v-btn>
 							<v-btn v-if='authorized' @click="validateEvents(false)">Reject proposed event(s)</v-btn>
@@ -54,30 +68,75 @@
 				</v-container>
 				<v-container>
 					<v-card>
-						<v-toolbar flat color="primary" dark>
+						<v-toolbar flat color="red darken-2" dark>
 							<v-toolbar-title>Check the results</v-toolbar-title>
 						</v-toolbar>
-						<v-card-text>Google Calendar doesn't accept live updates :( Please <v-btn @click="refresh">reload</v-btn> to
-							see the results.</v-card-text>
-						<div :key="iframe_key">
+						<v-card-text>So that's the WUTAN CALENDAR I was talking about. It will be visible by anyone on
+							the internet -- no credentials required. I've picked Google Calendar over rivals because it
+							is easy to share, can sync with many different platforms -- Web, Android, iPhone -- and can
+							be easily embedded on any website supporting plain html. Also it's much more programmeable
+							than Facebook, which is incredibly closed to developers. If you have accepted events
+							submissions, you can now hit <v-btn @click="refreshFrame">reload</v-btn> to see the results
+							of your newly validated events.</v-card-text>
+							<v-card class="d-flex pa-2" outlined tile>
+							<div :key="iframe_key">
 							<iframe
-							src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;mode=AGENDA&amp;showTz=0&amp;showCalendars=0&amp;showTabs=1&amp;showPrint=0&amp;showDate=1&amp;showNav=1&amp;showTitle=1&amp;title=Swiss%20Wutan%20All%20Schools%20Agenda"
-							style="border-width:10" margin-left="12" width="900" height="300" frameborder="0" scrolling="no"></iframe>
-						</div>
+								src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=0&amp;showDate=1&amp;showPrint=0&amp;showCalendars=0&amp;showTz=0&amp;mode=MONTH&amp;hl=en_GB"
+								style="border-width:0" width="900" height="600" frameborder="0" scrolling="no"></iframe>
+							</div>
+							</v-card>
 					</v-card>
 				</v-container>
 				<v-container>
 					<v-card>
-						<v-toolbar flat color="primary" dark>
+						<v-toolbar flat color="red darken-2" dark>
 							<v-toolbar-title>Submit new events</v-toolbar-title>
 						</v-toolbar>
-						<v-card-text>To be validated as above.</v-card-text>
-						<v-date-picker
-							v-model="date1"
-							:events="arrayEvents"
-							event-color="green lighten-1"
-						></v-date-picker>
-					</v-card>
+						<v-card-text>By contrast with the other sections of the page, this one will be visible to anyone
+							on the internet. People are supposed to use it to submit new events.</v-card-text>
+						<v-card class="d-flex pa-2" outlined tile>
+							<v-form ref="form" v-model="valid" lazy-validation>
+								<v-container>
+									<v-row>
+										<v-col cols="12" md="4">
+											<v-text-field v-model="firstName" :counter="25" :rules="firstNameRules"
+												label="First name" required>
+											</v-text-field>
+											<v-text-field v-model="lastName" :counter="25" :rules="lastNameRules"
+												label="Last Name" required>
+											</v-text-field>
+										</v-col>
+										<v-col cols="12" md="4">
+											<v-text-field v-model="email" :rules="emailRules" label="E-mail" required>
+											</v-text-field>
+											<v-text-field v-model="phone" :rules="phoneRules" label="Phone number"
+												required></v-text-field>
+										</v-col>
+										<v-col cols="12" md="4">
+											<v-checkbox v-model="is_school"
+												label="I am submitting on behalf of a Swiss Wutan school"></v-checkbox>
+											<v-text-field v-if="is_school" v-model="schoolName"
+												:rules="[v => !!v || 'Deselect the previous checkbox or please do mention your school']"
+												label="School" required></v-text-field>
+										</v-col>
+										<v-col cols="12" md="4">
+											<v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">
+												Validate
+											</v-btn>
+											<v-btn color="error" class="mr-4" @click="reset">
+												Reset Form
+											</v-btn>
+											<v-btn color="warning" @click="resetValidation">
+												Reset Validation
+											</v-btn>
+										</v-col>
+									</v-row>
+								</v-container>
+							</v-form>
+						</v-card>
+				</v-container>
+				</v-card>
+				</v-card>
 				</v-container>
 			</v-content>
 		</v-app>
