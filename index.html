@@ -42,27 +42,79 @@
 						<v-toolbar flat color="red darken-2" dark>
 							<v-toolbar-title>Accept or reject events submissions</v-toolbar-title>
 						</v-toolbar>
-						<v-card-text>These two horizontal tabs allow you to switch between events proposed but not yet
-							validated (i.e. accepted or rejected) and events already scheduled events. You need to be logged in to accept/reject events.</v-card-text>
+						<v-card-text>These two horizontal tabs allow you to switch between events submitted but not yet
+							validated (i.e. accepted or rejected) and events already scheduled events.</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<v-tabs v-model="active_tab" vertical>
-								<v-tab key='"0"'>Proposed events</v-tab>
-								<v-tab key='"1"'>Scheduled events</v-tab>
-								<v-tab-item key='"0"'>
+								<v-tab key="0">Proposed events</v-tab>
+								<v-tab key="1">Scheduled events</v-tab>
+								<!-- SUBMITTED EVENTS -->
+								<v-tab-item key="0">
 									<v-card flat>
-										<v-card-text>{{ proposedEvents }}</v-card-text>
+										<div v-if="authorized">
+											<v-simple-table v-if="proposedEvents">
+												<template v-slot:default>
+													<thead>
+														<tr>
+															<th class="text-left">Select</th>
+															<th class="text-left">Title</th>
+															<th class="text-left">Start</th>
+															<th class="text-left">End</th>
+															<th class="text-left">Location</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr v-for="pe in proposedEvents" :key="pe">
+															<td>
+																<v-checkbox v-model="selectedProposedEvents"
+																	:value="pe"></v-checkbox>
+															</td>
+															<td>{{ pe.summary }}</td>
+															<td>{{ pe.start.dateTime }}</td>
+															<td>{{ pe.end.dateTime }}</td>
+															<td>{{ pe.location }}</td>
+														</tr>
+													</tbody>
+												</template>
+											</v-simple-table>
+										</div>
+										<div v-else>
+											<v-card-text>You need to be logged in to see submitted events.</v-card-text>
+										</div>
 									</v-card>
 								</v-tab-item>
-								<v-tab-item key='"1"'>
+								<!-- CONFIRMED EVENTS -->
+								<v-tab-item key="1">
 									<v-card flat>
-										<v-card-text>{{ events }}</v-card-text>
+										<v-simple-table v-if="events">
+											<template v-slot:default>
+												<thead>
+													<tr>
+														<th class="text-left">Title</th>
+														<th class="text-left">Start</th>
+														<th class="text-left">End</th>
+														<th class="text-left">Location</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr v-for="e in events" :key="e">
+														<td>{{ e.summary }}</td>
+														<td>{{ e.start.dateTime }}</td>
+														<td>{{ e.end.dateTime }}</td>
+														<td>{{ e.location }}</td>
+													</tr>
+												</tbody>
+											</template>
+										</v-simple-table>
 									</v-card>
 								</v-tab-item>
 							</v-tabs>
 						</v-card>
 						<v-card-actions>
-							<v-btn v-if='authorized' @click="validateEvents(true)">Accept proposed event(s)</v-btn>
-							<v-btn v-if='authorized' @click="validateEvents(false)">Reject proposed event(s)</v-btn>
+							<v-btn v-if="authorized && selectedProposedEvents.length > 0" @click="validateEvents(true)">Accept proposed event(s)</v-btn>
+							<v-btn v-else-if='authorized' @click="validateEvents(true)" disabled>Accept proposed event(s)</v-btn>
+							<v-btn v-if="authorized && selectedProposedEvents.length > 0" @click="validateEvents(false)">Reject proposed event(s)</v-btn>
+							<v-btn v-else-if='authorized' @click="validateEvents(false)" disabled>Reject proposed event(s)</v-btn>
 						</v-card-actions>
 					</v-card>
 				</v-container>
@@ -153,9 +205,9 @@
 											</v-checkbox>
 										</v-col>
 										<v-col cols="12" md="6">
-										<v-checkbox v-model="discount"
-											label="Swiss Wutan members get a special discount">
-										</v-checkbox>
+											<v-checkbox v-model="discount"
+												label="Swiss Wutan members get a special discount">
+											</v-checkbox>
 										</v-col>
 										<!-- COMMENTS -->
 										<v-container fluid>

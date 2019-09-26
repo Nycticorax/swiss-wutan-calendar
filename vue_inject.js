@@ -16,9 +16,10 @@ window.onload = function () {
 			return {
 				api: undefined,
 				authorized: false,
-				events: undefined,
-				proposedEvents: undefined,
-				active_tab: 0,
+				events: [],
+				proposedEvents: [],
+				selectedProposedEvents: [],
+				active_tab: 1,
 				iframe_key: 0,
 				// form
 				valid: true,
@@ -68,15 +69,6 @@ window.onload = function () {
 			this.handleClientLoad();
 		},
 
-		mounted() {
-			this.arrayEvents = [...Array(6)].map(() => {
-				const day = Math.floor(Math.random() * 30)
-				const d = new Date()
-				d.setDate(day)
-				return d.toISOString().substr(0, 10)
-			})
-		},
-
 		methods: {
 			//On load, called to load the auth2 library and API client library.
 			handleClientLoad() {
@@ -106,6 +98,7 @@ window.onload = function () {
 				Promise.resolve(this.api.auth2.getAuthInstance().signIn())
 					.then(_ => {
 						this.authorized = true;
+						this.active_tab = 0
 					});
 			},
 
@@ -132,7 +125,7 @@ window.onload = function () {
 					})
 					r.execute((e) => {
 						this.pullScheduled()
-						this.proposedEvents = undefined
+						this.proposedEvents = []
 						this.active_tab = 1
 					});
 				});
@@ -168,20 +161,15 @@ window.onload = function () {
 					'orderBy': 'startTime'
 				}).then(response => {
 					let events = response.result.items;
-					let res = []
-					if (events.length > 0) {
-						for (i = 0; i < events.length; i++) {
-							var event = events[i];
-							var when = event.start.dateTime;
-							if (!when) {
-								when = event.start.date;
-							}
-							res.push(event.summary + ' (' + when + ')')
+					this.events = events.map(e => {
+						return {
+							'summary': e.summary,
+							'description': e.description,
+							'location': e.location,
+							'start': {'dateTime': e.start.dateTime},
+							'end': {'dateTime:': e.end.dateTime}
 						}
-					} else {
-						res.push('No upcoming events found.');
-					}
-					this.events = res
+					})	
 				});
 
 			},
@@ -195,9 +183,6 @@ window.onload = function () {
 			validate() {
 				if (this.$refs.form.validate()) {
 					this.snackbar = true
-					if (typeof(this.proposedEvents) == 'undefined') {
-						this.proposedEvents = []
-					}
 					this.proposedEvents.push({
 						'summary': this.eventTitle,
 						'location': this.eventLocation,
@@ -227,7 +212,6 @@ window.onload = function () {
 			pickerDate(val) {
 				this.displayedEvents = this.events.filter(e => val == e.start.dateTime.toISOString().substr(0, 10))
 			},
-
 		}
 	});
 }
