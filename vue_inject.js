@@ -51,6 +51,8 @@ window.onload = function () {
 				displayedEvents: [],
 				eventTitle: '',
 				eventLocation: '',
+				eventStart: '2019-09-29T09:00:00-07:00',
+				eventEnd: '2019-09-29T09:00:00-07:00',
 				selected_martial_arts: ['Bagua', 'Baji', 'Tai chi'],
 				martial_arts:['Bagua', 'Baji', 'Tai chi', 'Kung Fu', 'Mizongyi', 'Xing Yi'],
 				comments: '',
