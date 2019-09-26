@@ -20,13 +20,26 @@
 						<v-toolbar flat color="red darken-2" dark>
 							<v-toolbar-title>Authenticate on Google Calendar</v-toolbar-title>
 						</v-toolbar>
-						<v-card-text>Hello and welcome. Couple of words to explain how this page works. If you have
-							something like an "admin" role in Swiss Wutan (i.e. Sergej), you can use this little web
-							app to manage EVENTS SUBMISSIONS. The idea is that anyone -- perhaps an individual or
-							institutional member from Swiss Wutan, but not necessarily -- can submit events to the
-							SWISS WUTAN CALENDAR -- displayed here below. By contrast, only people vested with an
-							"admin" role can accept or reject events submissions. This process is explained below.
-							At the end of the day this removes all the bureaucratic shenanigans so that we can all
+						<v-card-text>
+							<p>The goal of this page is to demo a workable, in-house
+								alternative to Facebook for managing Swiss Wutan's events. Reasons to go all-in with
+								Facebook are (a) Facebook is the ultimate owner of the content it hosts; (b) Facebook
+								has a
+								poor record in protecting users' privacy, (c) Facebook is extremely opaque and has poor
+								programming interfaces and finally (d) it's always good not to put all one's eggs in the
+								same basket, i.e. not assume everyone likes to use Facebook for managing
+								community-driven time schedules. And if you still are in love with Facebook you can use <a href="https://www.facebook.com/help/152652248136178/">these instructions</a> to export Facebook's events to Google Calendar.</p>
+							<p>Onto the concept. It works like this.
+								<ol>
+									<li>Anyone -- perhaps an individual or
+										institutional member of Swiss Wutan, but not necessarily -- can submit events to
+										the
+										SWISS WUTAN CALENDAR -- displayed here below</li>
+									<li>People vested with an
+										"admin" role can accept or reject events submissions. This process is explained
+										below.</li>
+								</ol>
+							</p>At the end of the day this removes all the bureaucratic shenanigans so that we can all
 							focus on what matters -- <em>Wutan!</em>
 						</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
@@ -42,7 +55,7 @@
 						<v-toolbar flat color="red darken-2" dark>
 							<v-toolbar-title>Accept or reject events submissions</v-toolbar-title>
 						</v-toolbar>
-						<v-card-text>These two horizontal tabs allow you to switch between events submitted but not yet
+						<v-card-text>This section lets you switch between events submitted but not yet
 							validated (i.e. accepted or rejected) and events already scheduled events.</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<v-tabs color="red darken-2" v-model="active_tab" vertical>
@@ -111,7 +124,8 @@
 							</v-tabs>
 						</v-card>
 						<v-card-actions>
-							<v-btn v-if="authorized && selectedSubmittedEvents.length > 0" @click="validateEvents(true)">
+							<v-btn v-if="authorized && selectedSubmittedEvents.length > 0"
+								@click="validateEvents(true)">
 								Accept submitted event(s)</v-btn>
 							<v-btn v-else-if='authorized' @click="validateEvents(true)" disabled>Accept submitted
 								event(s)</v-btn>
@@ -127,13 +141,29 @@
 						<v-toolbar flat color="red darken-2" dark>
 							<v-toolbar-title>Check the results</v-toolbar-title>
 						</v-toolbar>
-						<v-card-text>So that's the WUTAN CALENDAR I was talking about. It will be visible by anyone on
-							the internet -- no credentials required. I've picked Google Calendar over rivals because it
-							is easy to share, can sync with many different platforms -- Web, Android, iPhone -- and can
-							be easily embedded on any website supporting plain html. Also it's much more programmeable
-							than Facebook, which is incredibly closed to developers. If you have accepted events
-							submissions, you can now hit <v-btn @click="refreshFrame">reload</v-btn> to see the results
-							of your newly validated events.</v-card-text>
+						<v-card-text>
+							<p>So that's the WUTAN CALENDAR I was talking about. It will be visible by anyone on
+								the internet -- no credentials required. Google Calendars are usually seen from their <a
+									href="https://calendar.google.com/calendar/embed?src=3mo0a639qfhs9tjc1idmu4kkus%40group.calendar.google.com&ctz=Europe%2FZurich">home
+									page</a>. I've picked Google Calendar over rivals because it
+								is easy to share, can sync up any two calendars (like, I can literally fuse my private
+								calendar with SWISS WUTAN's calendar) and is available on many different platforms --
+								Web, Android, iPhone. Finally it can
+								be easily embedded on any website supporting plain html & javascript -- such as swiss
+								wutan's very own website. It also supports custom email notifications.</p>
+							<p> If you have accepted events
+								submissions you can now hit <v-btn @click="refreshFrame">reload</v-btn> to see the
+								results
+								of the newly validated events.</p>
+							<p>If you are curious here's more details about the future dataflow:
+								<ol>
+									<li>Users submit events using the form below (done).</li>
+									<li>Events are stored at one of Google databases (to do).</li>
+									<li>Events that get accepted are pushed into the Swiss Wutan Calendar and erased
+										from the database, visible to anyone, with or without Facebook (done)</li>
+								</ol>
+							</p>
+						</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<div :key="iframe_key">
 								<iframe
@@ -149,7 +179,7 @@
 						<v-toolbar flat color="red darken-2" dark>
 							<v-toolbar-title>Submit new events</v-toolbar-title>
 						</v-toolbar>
-						<v-card-text>By contrast with the other sections of the page, this one will be visible to anyone
+						<v-card-text>By contrast to the other sections of the page, this one will be visible to anyone
 							on the internet. People are supposed to use it to submit new events.</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<v-form ref="form" v-model="valid" lazy-validation>
@@ -157,23 +187,25 @@
 									<v-row>
 										<!-- TEXT FIELDS -->
 										<v-col cols="12" md="4">
-											<v-text-field v-model="firstName" :counter="25" :rules="firstNameRules" outlined
-												label="First name" required>
+											<v-text-field v-model="author.firstName" :counter="25"
+												:rules="firstNameRules" outlined label="First name" required>
 											</v-text-field>
-											<v-text-field v-model="lastName" :counter="25" :rules="lastNameRules" outlined
-												label="Last name" required>
+											<v-text-field v-model="author.lastName" :counter="25" :rules="lastNameRules"
+												outlined label="Last name" required>
 											</v-text-field>
 										</v-col>
 										<v-col cols="12" md="4">
-											<v-text-field v-model="email" :rules="emailRules" label="Email" required outlined>
+											<v-text-field v-model="author.email" :rules="emailRules" label="Email"
+												required outlined>
 											</v-text-field>
-											<v-text-field v-model="phone" :rules="phoneRules" label="Phone number"
-												required outlined></v-text-field>
+											<v-text-field v-model="author.phone" :rules="phoneRules"
+												label="Phone number" required outlined></v-text-field>
 										</v-col>
 										<v-col cols="12" md="4">
-											<v-checkbox v-model="is_school" color="red darken-2"
+											<v-checkbox v-model="author.is_school" color="red darken-2"
 												label="I am submitting on behalf of a Swiss Wutan school"></v-checkbox>
-											<v-select v-if="is_school" v-model="school" :items="schools" label="School" outlined
+											<v-select v-if="author.is_school" v-model="author.school"
+												:items="schools_opts" label="School" outlined
 												:rules="[v => !!v || 'Deselect the previous checkbox or please do mention your school']"
 												required></v-select>
 										</v-col>
@@ -183,52 +215,57 @@
 												:picker-date.sync="pickerDate" full-width></v-date-picker>
 										</v-col>
 										<v-col cols="12" sm="6" class="my-2 px-1">
-											<div class="title">Already planned this month</div>
-											<div class="subheading">Please get in touch in case of unfortunate overlaps.
+											<div class="subheading">Here are events scheduled for the displayed month.
+												Please do get in touch to avoid unfortunate overlaps.
 											</div>
 											<ul class="ma-4">
-												<li v-for="e in thisMonthEvents">{{ e.summary }}{{ e.start.dateTime }}</li>
+												<li v-for="e in thisMonthEvents">{{ e.summary }}{{ e.start.dateTime }}
+												</li>
 											</ul>
 											<br /><br />
-											<v-combobox v-model="dates" multiple chips :items="dates" label="Dates picked" deletable-chips></v-combobox>
+											<v-combobox v-model="dates" multiple chips :items="dates"
+												label="Dates picked" deletable-chips></v-combobox>
+											<v-text-field label="Time" value="event.time" type="time"></v-text-field>
 										</v-col>
 										<!-- EVENT CONTENT -->
 										<v-col cols="12" md="6">
-											<v-text-field v-model="eventTitle" label="Event title" filled required>
+											<v-text-field v-model="event.title" label="Event title" filled required>
 											</v-text-field>
-											<v-select :items="levels" v-model="level" label="Suggested level(s)" multiple chips
-												multiple></v-select>
+											<v-select :items="levels_opts" v-model="event.levels"
+												label="Suggested level(s)" deletable-chips multiple chips multiple>
+											</v-select>
 										</v-col>
 										<v-col cols="12" md="6">
-											<v-text-field v-model="eventLocation" label="Event location" filled required>
+											<v-text-field v-model="event.location" label="Event location" filled
+												required>
 											</v-text-field>
-											<v-combobox v-model="selected_martial_arts" multiple chips
-												:items="martial_arts" label="Featured styles"></v-combobox>
+											<v-combobox v-model="event.arts" deletable-chips multiple chips
+												:items="arts_opts" label="Featured styles"></v-combobox>
 										</v-col>
 										<!-- MORE CHECKBOXES -->
 										<v-col cols="12" md="6">
-											<v-checkbox v-model="privacy" color="red darken-2"
+											<v-checkbox v-model="event.privacy" color="red darken-2"
 												label="This event is meant only for Swiss Wutan members">
 											</v-checkbox>
-											<v-checkbox v-model="registration" color="red darken-2"
+											<v-checkbox v-model="event.registration" color="red darken-2"
 												label="Registration required">
 											</v-checkbox>
 										</v-col>
 										<v-col cols="12" md="6">
-											<v-checkbox v-model="discount" color="red darken-2"
+											<v-checkbox v-model="event.discount" color="red darken-2"
 												label="Swiss Wutan members get a special discount">
 											</v-checkbox>
-											<div id="register" v-if=registration>
-											<v-combobox v-model="registration_details" :items="fillFromOpts" filled
-												label="Participants register here (url, email):....">
-											</v-combobox>
+											<div id="register" v-if=event.registration>
+												<v-combobox v-model="event.registration_details" :items="fillFromOpts"
+													filled label="Participants register here (url, email):....">
+												</v-combobox>
 											</div>
 										</v-col>
-										
+
 										<!-- COMMENTS -->
 										<v-container fluid>
-											<v-textarea label="If appropriate please describe the event."
-												auto-grow outlined shaped v-model="comments"></v-textarea>
+											<v-textarea label="If appropriate please describe the event." auto-grow
+												outlined shaped v-model="event.comments"></v-textarea>
 										</v-container>
 										<!-- SUBMIT -->
 										<v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">
@@ -253,5 +290,4 @@
 	<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 	<script src="vue_inject.js"></script>
 </body>
-
 </html>

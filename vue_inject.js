@@ -14,6 +14,7 @@ window.onload = function () {
 		vuetify: new Vuetify(),
 		data() {
 			return {
+				// operational stuff
 				api: undefined,
 				authorized: false,
 				events: [],
@@ -21,10 +22,7 @@ window.onload = function () {
 				selectedProposedEvents: [],
 				active_tab: 1,
 				iframe_key: 0,
-				// form
 				valid: true,
-				firstName: '',
-				lastName: '',
 				firstNameRules: [
 					v => !!v || 'Name is required',
 					v => (v && v.length <= 25) || 'Name must be less than 10 characters',
@@ -33,38 +31,45 @@ window.onload = function () {
 					v => !!v || 'Name is required',
 					v => (v && v.length <= 25) || 'Name must be less than 10 characters',
 				],
-				email: '',
 				emailRules: [
 					v => !!v || 'E-mail is required',
 					v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
 				],
-				phone: '',
 				phoneRules: [
 					v => !!v || 'Phone number is required',
 					v => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(v.trim()) || 'Phone number must be valid',
 				],
-				is_school: null,
-				school: '',
-				schools: ['Basel','Bern','Biel','Fribourg','Thun'],
-				// dates
-				dates: [new Date().toISOString().substr(0, 10)],
+				schools_opts: ['Basel','Bern','Biel','Fribourg','Thun'],
+				// author
+				dates: [],
 				refDate: new Date().toISOString().substr(0, 10),
-				menu: false,
 				pickerDate: null,
-				eventTitle: '',
-				eventLocation: '',
-				eventStart: '2019-09-29T09:00:00-07:00',
-				eventEnd: '2019-09-29T09:00:00-07:00',
-				selected_martial_arts: ['Bagua', 'Baji', 'Tai chi'],
-				martial_arts:['Bagua', 'Baji', 'Tai chi', 'Kung Fu', 'Mizongyi', 'Xing Yi'],
-				comments: '',
-				level: ['Beginners', 'Advanced'],
-				levels: ['Beginners', 'Advanced'],
-				privacy: null,
-				discount: null,
-				registration: null,
-				registration_details: '',
-				fillFromOpts: ['fill from email','fill from phone', 'fill from school']
+				author: {
+					firstName: '',
+					lastName: '',
+					email: '',
+					phone: '',
+					is_school: null,
+					school:''
+				},
+				// event
+				event: {
+					title: '',
+					location: '',
+					start: '2019-09-29T09:00:00-07:00',
+					end: '2019-09-29T09:00:00-07:00',
+					time: '',
+					arts: ['Bagua', 'Baji', 'Tai chi'],
+					levels: ['Beginners', 'Advanced'],
+					privacy: null,
+					discount: null,
+					registration: null,
+					registration_details: '',
+					comment:'',
+				},
+				arts_opts:['Bagua', 'Baji', 'Tai chi', 'Kung Fu', 'Mizongyi', 'Xing Yi'],
+				levels_opts: ['Beginners', 'Advanced'],
+				fillFrom_opts: ['fill from email','fill from phone', 'fill from school']
 			}
 		},
 
