@@ -47,7 +47,7 @@ window.onload = function () {
 				school: '',
 				schools: ['Basel','Bern','Biel','Fribourg','Thun'],
 				// dates
-				date: new Date().toISOString().substr(0, 10),
+				dates: [new Date().toISOString().substr(0, 10)],
 				refDate: new Date().toISOString().substr(0, 10),
 				menu: false,
 				pickerDate: null,
@@ -100,7 +100,6 @@ window.onload = function () {
 				}).then(() => {
 					this.pullScheduled()
 					this.pullProposed()
-					this.pickerDate = new Date().toISOString().substr(0, 10)
 				})
 			},
 

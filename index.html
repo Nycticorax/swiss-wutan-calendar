@@ -179,7 +179,7 @@
 										</v-col>
 										<!-- DATES -->
 										<v-col cols="12" sm="6" class="my-2 px-1">
-											<v-date-picker ref="picker" v-model="date" color="red darken-2"
+											<v-date-picker ref="picker" v-model="dates" multiple color="red darken-2"
 												:picker-date.sync="pickerDate" full-width></v-date-picker>
 										</v-col>
 										<v-col cols="12" sm="6" class="my-2 px-1">
@@ -189,6 +189,8 @@
 											<ul class="ma-4">
 												<li v-for="e in thisMonthEvents">{{ e.summary }}{{ e.start.dateTime }}</li>
 											</ul>
+											<br /><br />
+											<v-combobox v-model="dates" multiple chips :items="dates" label="Dates picked" deletable-chips></v-combobox>
 										</v-col>
 										<!-- EVENT CONTENT -->
 										<v-col cols="12" md="6">
