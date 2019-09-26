@@ -46,13 +46,13 @@
 							validated (i.e. accepted or rejected) and events already scheduled events.</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<v-tabs color="red darken-2" v-model="active_tab" vertical>
-								<v-tab key="0">Proposed events</v-tab>
+								<v-tab key="0">Submitted events</v-tab>
 								<v-tab key="1">Scheduled events</v-tab>
 								<!-- SUBMITTED EVENTS -->
 								<v-tab-item key="0">
 									<v-card flat>
 										<div v-if="authorized">
-											<v-simple-table v-if="proposedEvents">
+											<v-simple-table v-if="submittedEvents">
 												<template v-slot:default>
 													<thead>
 														<tr>
@@ -64,9 +64,9 @@
 														</tr>
 													</thead>
 													<tbody>
-														<tr v-for="pe in proposedEvents">
+														<tr v-for="pe in submittedEvents">
 															<td>
-																<v-checkbox v-model="selectedProposedEvents"
+																<v-checkbox v-model="selectedSubmittedEvents"
 																	:value="pe"></v-checkbox>
 															</td>
 															<td>{{ pe.summary }}</td>
@@ -111,13 +111,13 @@
 							</v-tabs>
 						</v-card>
 						<v-card-actions>
-							<v-btn v-if="authorized && selectedProposedEvents.length > 0" @click="validateEvents(true)">
-								Accept proposed event(s)</v-btn>
-							<v-btn v-else-if='authorized' @click="validateEvents(true)" disabled>Accept proposed
+							<v-btn v-if="authorized && selectedSubmittedEvents.length > 0" @click="validateEvents(true)">
+								Accept submitted event(s)</v-btn>
+							<v-btn v-else-if='authorized' @click="validateEvents(true)" disabled>Accept submitted
 								event(s)</v-btn>
-							<v-btn v-if="authorized && selectedProposedEvents.length > 0"
-								@click="validateEvents(false)">Reject proposed event(s)</v-btn>
-							<v-btn v-else-if='authorized' @click="validateEvents(false)" disabled>Reject proposed
+							<v-btn v-if="authorized && selectedSubmittedEvents.length > 0"
+								@click="validateEvents(false)">Reject submitted event(s)</v-btn>
+							<v-btn v-else-if='authorized' @click="validateEvents(false)" disabled>Reject submitted
 								event(s)</v-btn>
 						</v-card-actions>
 					</v-card>
