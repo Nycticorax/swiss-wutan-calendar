@@ -18,7 +18,7 @@
 				<v-container>
 					<v-card>
 						<v-toolbar flat color="red darken-2" dark>
-							<v-toolbar-title>Authenticate on Google Calendar</v-toolbar-title>
+							<v-toolbar-title>Introduction</v-toolbar-title>
 						</v-toolbar>
 						<v-card-text>
 							<p>The goal of this page is to demo a workable, in-house
@@ -31,20 +31,31 @@
 								community-driven time schedules. And if you still are in love with Facebook you can use
 								<a href="https://www.facebook.com/help/152652248136178/">these instructions</a> to
 								export Facebook's events to Google Calendar.</p>
-							<p>Onto the concept. It works like this.
+							<p>Onto the concept. It works like this.</p>
 								<ol>
 									<li>Anyone -- perhaps an individual or
 										institutional member of Swiss Wutan, but not necessarily -- can submit events to
 										the
 										SWISS WUTAN CALENDAR -- displayed here below</li>
-									<li>Submitted events don't need to be organized by Swiss Wutan or affiliates. They can just be interested for our community, or for some schools, etc. It's very easy with this setup to create different categories for events, and to search them smoothly.</li>
+									<li>Submitted events don't need to be organized by Swiss Wutan or affiliates. They
+										can just be interested for our community, or for some schools, etc. It's very
+										easy with this setup to create different categories for events, and to search
+										them smoothly.</li>
 									<li>People vested with an
 										"admin" role can accept or reject events submissions. This process is explained
 										below.</li>
 								</ol>
-							</p>At the end of the day this removes all the bureaucratic shenanigans so that we can all
-							focus on what matters -- <em>Wutan!</em>  (For the curious, source code is sleeping <a href="https://github.com/Nycticorax/swiss-wutan-calendar">here</a>.)
+							At the end of the day this removes all the bureaucratic shenanigans so that we can all
+							focus on what matters -- <em>Wutan!</em> (For the curious, source code is sleeping <a
+								href="https://github.com/Nycticorax/swiss-wutan-calendar">here</a>.)
 						</v-card-text>
+					</v-card>
+				</v-container>
+				<v-container>
+					<v-card>
+						<v-toolbar flat color="red darken-2" dark>
+							<v-toolbar-title>Authenticate on Google Calendar</v-toolbar-title>
+						</v-toolbar>
 						<v-card class="d-flex pa-2" outlined tile>
 							<v-card-actions>
 								<v-btn v-if='!authorized' @click="handleAuthClick">Log in</v-btn>
@@ -158,14 +169,14 @@
 								submissions you can now hit <v-btn @click="refreshFrame">reload</v-btn> to see the
 								results
 								of the newly validated events.</p>
-							<p>If you are curious here's my todo list:
+							<p>If you are curious here's my todo list:</p>
 								<ol>
 									<li>Accepting events & writing them into Google Calendar (done)</li>
 									<li>Storing events in in-house database</li>
 									<li>Setting up web + email notifications</li>
-									<li>Organizing event in categories and letting users subscribe for receiving relevant notifications</li>
+									<li>Organizing event in categories and letting users subscribe for receiving
+										relevant notifications</li>
 								</ol>
-							</p>
 						</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<div :key="iframe_key">
@@ -235,7 +246,7 @@
 											<v-text-field v-model="event.title" label="Event title" filled required>
 											</v-text-field>
 											<v-select :items="levels_opts" v-model="event.levels"
-												label="Suggested level(s)" deletable-chips multiple chips multiple>
+												label="Suggested level(s)" deletable-chips multiple chips>
 											</v-select>
 										</v-col>
 										<v-col cols="12" md="6">
