@@ -39,7 +39,7 @@ window.onload = function () {
 					v => !!v || 'Phone number is required',
 					v => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(v.trim()) || 'Phone number must be valid',
 				],
-				schools_opts: ['Basel', 'Bern', 'Biel', 'Fribourg', 'Thun'],
+				schools_opts: ['Goju Kan Bern', 'Wutan Thun', 'Zenshin Basel', 'Kungfu21', 'Taekwondo Schule Basel', 'Training Center Fribourg'],
 				// author
 				dates: [],
 				refDate: new Date().toISOString().substr(0, 10),
