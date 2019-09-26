@@ -64,7 +64,7 @@
 														</tr>
 													</thead>
 													<tbody>
-														<tr v-for="pe in proposedEvents" :key="pe">
+														<tr v-for="pe in proposedEvents">
 															<td>
 																<v-checkbox v-model="selectedProposedEvents"
 																	:value="pe"></v-checkbox>
@@ -97,7 +97,7 @@
 													</tr>
 												</thead>
 												<tbody>
-													<tr v-for="e in events" :key="e">
+													<tr v-for="e in events">
 														<td>{{ e.summary }}</td>
 														<td>{{ e.start.dateTime }}</td>
 														<td>{{ e.end.dateTime }}</td>
@@ -157,23 +157,23 @@
 									<v-row>
 										<!-- TEXT FIELDS -->
 										<v-col cols="12" md="4">
-											<v-text-field v-model="firstName" :counter="25" :rules="firstNameRules"
+											<v-text-field v-model="firstName" :counter="25" :rules="firstNameRules" outlined
 												label="First name" required>
 											</v-text-field>
-											<v-text-field v-model="lastName" :counter="25" :rules="lastNameRules"
+											<v-text-field v-model="lastName" :counter="25" :rules="lastNameRules" outlined
 												label="Last Name" required>
 											</v-text-field>
 										</v-col>
 										<v-col cols="12" md="4">
-											<v-text-field v-model="email" :rules="emailRules" label="E-mail" required>
+											<v-text-field v-model="email" :rules="emailRules" label="Email" required outlined>
 											</v-text-field>
 											<v-text-field v-model="phone" :rules="phoneRules" label="Phone number"
-												required></v-text-field>
+												required outlined></v-text-field>
 										</v-col>
 										<v-col cols="12" md="4">
-											<v-checkbox v-model="is_school"
+											<v-checkbox v-model="is_school" color="red darken-2"
 												label="I am submitting on behalf of a Swiss Wutan school"></v-checkbox>
-											<v-select v-if="is_school" :items="schools" label="School" outlined
+											<v-select v-if="is_school" v-model="school" :items="schools" label="School" outlined
 												:rules="[v => !!v || 'Deselect the previous checkbox or please do mention your school']"
 												required></v-select>
 										</v-col>
@@ -187,36 +187,46 @@
 											<div class="subheading">Please get in touch in case of unfortunate overlaps.
 											</div>
 											<ul class="ma-4">
-												<li v-for="e in thisMonthEvents" :key="e">{{ e.summary }}{{ e.start.dateTime }}</li>
+												<li v-for="e in thisMonthEvents">{{ e.summary }}{{ e.start.dateTime }}</li>
 											</ul>
 										</v-col>
 										<!-- EVENT CONTENT -->
 										<v-col cols="12" md="6">
-											<v-text-field v-model="eventLocation" label="Event location" required>
+											<v-text-field v-model="eventTitle" label="Event title" filled required>
 											</v-text-field>
-											<v-select :items="levels" v-model="level" label="Suggested level(s)"
+											<v-select :items="levels" v-model="level" label="Suggested level(s)" multiple chips
 												multiple></v-select>
 										</v-col>
 										<v-col cols="12" md="6">
-											<v-text-field v-model="eventTitle" label="Event title" required>
+											<v-text-field v-model="eventLocation" label="Event location" filled required>
 											</v-text-field>
 											<v-combobox v-model="selected_martial_arts" multiple chips
 												:items="martial_arts" label="Featured styles"></v-combobox>
 										</v-col>
+										<!-- MORE CHECKBOXES -->
 										<v-col cols="12" md="6">
-											<v-checkbox v-model="privacy"
+											<v-checkbox v-model="privacy" color="red darken-2"
 												label="This event is meant only for Swiss Wutan members">
 											</v-checkbox>
-										</v-col>
-										<v-col cols="12" md="6">
-											<v-checkbox v-model="discount"
-												label="Swiss Wutan members get a special discount">
+											<v-checkbox v-model="registration" color="red darken-2"
+												label="Registration required">
 											</v-checkbox>
 										</v-col>
+										<v-col cols="12" md="6">
+											<v-checkbox v-model="discount" color="red darken-2"
+												label="Swiss Wutan members get a special discount">
+											</v-checkbox>
+											<div id="register" v-if=registration>
+											<v-combobox v-model="registration_details" :items="fillFromOpts" filled
+												label="Participants register here (url, email):....">
+											</v-combobox>
+											</div>
+										</v-col>
+										
 										<!-- COMMENTS -->
 										<v-container fluid>
-											<v-textarea filled label="If appropriate please describe the event."
-												auto-grow v-model="comments"></v-textarea>
+											<v-textarea label="If appropriate please describe the event."
+												auto-grow outlined shaped v-model="comments"></v-textarea>
 										</v-container>
 										<!-- SUBMIT -->
 										<v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">

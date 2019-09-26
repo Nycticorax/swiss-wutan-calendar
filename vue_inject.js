@@ -44,6 +44,7 @@ window.onload = function () {
 					v => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(v.trim()) || 'Phone number must be valid',
 				],
 				is_school: null,
+				school: '',
 				schools: ['Basel','Bern','Biel','Fribourg','Thun'],
 				// dates
 				date: new Date().toISOString().substr(0, 10),
@@ -61,6 +62,9 @@ window.onload = function () {
 				levels: ['Beginners', 'Advanced'],
 				privacy: null,
 				discount: null,
+				registration: null,
+				registration_details: '',
+				fillFromOpts: ['fill from email','fill from phone', 'fill from school']
 			}
 		},
 
