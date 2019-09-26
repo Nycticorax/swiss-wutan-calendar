@@ -139,13 +139,13 @@
 											<v-text-field v-model="eventLocation" label="Event location" required>
 											</v-text-field>
 											<v-select :items="levels" v-model="level" label="Suggested level(s)"
-												multiple>
+												multiple></v-select>
 										</v-col>
 										<v-col cols="12" md="6">
 											<v-text-field v-model="eventTitle" label="Event title" required>
 											</v-text-field>
 											<v-combobox v-model="selected_martial_arts" multiple chips
-												:items="martial_arts" label="Featured styles">
+												:items="martial_arts" label="Featured styles"></v-combobox>
 										</v-col>
 										<v-col cols="12" md="6">
 											<v-checkbox v-model="privacy"
