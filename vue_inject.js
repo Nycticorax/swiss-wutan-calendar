@@ -20,9 +20,6 @@ window.onload = function () {
 				proposedEvents: undefined,
 				active_tab: 0,
 				iframe_key: 0,
-				arrayEvents: null,
-				date1: new Date().toISOString().substr(0, 10),
-				date2: new Date().toISOString().substr(0, 10),
 				// form
 				valid: true,
 				firstName: '',
@@ -40,12 +37,27 @@ window.onload = function () {
 					v => !!v || 'E-mail is required',
 					v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
 				],
+				phone: '',
 				phoneRules: [
 					v => !!v || 'Phone number is required',
 					v => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(v.trim()) || 'Phone number must be valid',
 				],
 				is_school: null,
-				schoolName: '',
+				schools: ['Basel','Bern','Biel','Fribourg','Thun'],
+				// dates
+				date: new Date().toISOString().substr(0, 10),
+				menu: false,
+				pickerDate: null,
+				displayedEvents: [],
+				eventTitle: '',
+				eventLocation: '',
+				selected_martial_arts: ['Bagua', 'Baji', 'Tai chi'],
+				martial_arts:['Bagua', 'Baji', 'Tai chi', 'Kung Fu', 'Mizongyi', 'Xing Yi'],
+				comments: '',
+				level: ['Beginners', 'Advanced'],
+				levels: ['Beginners', 'Advanced'],
+				privacy: null,
+				discount: null,
 			}
 		},
 
@@ -181,6 +193,22 @@ window.onload = function () {
 			validate() {
 				if (this.$refs.form.validate()) {
 					this.snackbar = true
+					if (typeof(this.proposedEvents) == 'undefined') {
+						this.proposedEvents = []
+					}
+					this.proposedEvents.push({
+						'summary': this.eventTitle,
+						'location': this.eventLocation,
+						'description': this.comments,
+						'start': {
+							'dateTime': this.eventStart,
+							'timeZone': 'Europe/Zurich'
+						},
+						'end': {
+							'dateTime': this.eventEnd,
+							'timeZone': 'Europe/Zurich'
+						}
+					})
 				}
 			},
 
@@ -191,7 +219,12 @@ window.onload = function () {
 			resetValidation() {
 				this.$refs.form.resetValidation()
 			},
+		},
 
+		watch: {
+			pickerDate(val) {
+				this.displayedEvents = this.events.filter(e => val == e.start.dateTime.toISOString().substr(0, 10))
+			},
 
 		}
 	});

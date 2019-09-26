@@ -21,19 +21,19 @@
 							<v-toolbar-title>Authenticate on Google Calendar</v-toolbar-title>
 						</v-toolbar>
 						<v-card-text>Hello and welcome. Couple of words to explain how this page works. If you have
-								something like an "admin" role in Swiss Wutan (i.e. Sergej), you can use this little web
-								app to manage EVENTS SUBMISSIONS. The idea is that anyone -- perhaps an individual or
-								institutional member from Swiss Wutan, but not necessarily -- can submit events to the
-								SWISS WUTAN CALENDAR -- displayed here below. By contrast, only people vested with an
-								"admin" role can accept or reject events submissions. This process is explained below.
-								At the end of the day this removes all the bureaucratic shenanigans so that we can all
-								focus on what matters -- <em>Wutan!</em>
+							something like an "admin" role in Swiss Wutan (i.e. Sergej), you can use this little web
+							app to manage EVENTS SUBMISSIONS. The idea is that anyone -- perhaps an individual or
+							institutional member from Swiss Wutan, but not necessarily -- can submit events to the
+							SWISS WUTAN CALENDAR -- displayed here below. By contrast, only people vested with an
+							"admin" role can accept or reject events submissions. This process is explained below.
+							At the end of the day this removes all the bureaucratic shenanigans so that we can all
+							focus on what matters -- <em>Wutan!</em>
 						</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<v-card-actions>
 								<v-btn v-if='!authorized' @click="handleAuthClick">Log in</v-btn>
 								<v-btn v-if='authorized' @click="handleSignoutClick">Log out</v-btn>
-						</v-card-actions>
+							</v-card-actions>
 						</v-card>
 					</v-card>
 				</v-container>
@@ -78,13 +78,14 @@
 							than Facebook, which is incredibly closed to developers. If you have accepted events
 							submissions, you can now hit <v-btn @click="refreshFrame">reload</v-btn> to see the results
 							of your newly validated events.</v-card-text>
-							<v-card class="d-flex pa-2" outlined tile>
+						<v-card class="d-flex pa-2" outlined tile>
 							<div :key="iframe_key">
-							<iframe
-								src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=0&amp;showDate=1&amp;showPrint=0&amp;showCalendars=0&amp;showTz=0&amp;mode=MONTH&amp;hl=en_GB"
-								style="border-width:0" width="900" height="600" frameborder="0" scrolling="no"></iframe>
+								<iframe
+									src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=0&amp;showDate=1&amp;showPrint=0&amp;showCalendars=0&amp;showTz=0&amp;mode=MONTH&amp;hl=en_GB"
+									style="border-width:0" width="900" height="600" frameborder="0"
+									scrolling="no"></iframe>
 							</div>
-							</v-card>
+						</v-card>
 					</v-card>
 				</v-container>
 				<v-container>
@@ -98,6 +99,7 @@
 							<v-form ref="form" v-model="valid" lazy-validation>
 								<v-container>
 									<v-row>
+										<!-- TEXT FIELDS -->
 										<v-col cols="12" md="4">
 											<v-text-field v-model="firstName" :counter="25" :rules="firstNameRules"
 												label="First name" required>
@@ -115,21 +117,61 @@
 										<v-col cols="12" md="4">
 											<v-checkbox v-model="is_school"
 												label="I am submitting on behalf of a Swiss Wutan school"></v-checkbox>
-											<v-text-field v-if="is_school" v-model="schoolName"
+											<v-select v-if="is_school" :items="schools" label="School" outlined
 												:rules="[v => !!v || 'Deselect the previous checkbox or please do mention your school']"
-												label="School" required></v-text-field>
+												required></v-select>
 										</v-col>
-										<v-col cols="12" md="4">
-											<v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">
-												Validate
-											</v-btn>
-											<v-btn color="error" class="mr-4" @click="reset">
-												Reset Form
-											</v-btn>
-											<v-btn color="warning" @click="resetValidation">
-												Reset Validation
-											</v-btn>
+										<!-- DATES -->
+										<v-col cols="12" sm="6" class="my-2 px-1">
+											<v-date-picker ref="picker" v-model="date" color="red darken-2"
+												:picker-date.sync="pickerDate" full-width></v-date-picker>
 										</v-col>
+										<v-col cols="12" sm="6" class="my-2 px-1">
+											<div class="title">Already planned this month</div>
+											<div class="subheading">Please get in touch in case of unfortunate overlaps.
+											</div>
+											<ul class="ma-4">
+												<li v-for="e in displayedEvents" :key="e">{{ e }}</li>
+											</ul>
+										</v-col>
+										<!-- EVENT CONTENT -->
+										<v-col cols="12" md="6">
+											<v-text-field v-model="eventLocation" label="Event location" required>
+											</v-text-field>
+											<v-select :items="levels" v-model="level" label="Suggested level(s)"
+												multiple>
+										</v-col>
+										<v-col cols="12" md="6">
+											<v-text-field v-model="eventTitle" label="Event title" required>
+											</v-text-field>
+											<v-combobox v-model="selected_martial_arts" multiple chips
+												:items="martial_arts" label="Featured styles">
+										</v-col>
+										<v-col cols="12" md="6">
+											<v-checkbox v-model="privacy"
+												label="This event is meant only for Swiss Wutan members">
+											</v-checkbox>
+										</v-col>
+										<v-col cols="12" md="6">
+										<v-checkbox v-model="discount"
+											label="Swiss Wutan members get a special discount">
+										</v-checkbox>
+										</v-col>
+										<!-- COMMENTS -->
+										<v-container fluid>
+											<v-textarea filled label="If appropriate please describe the event."
+												auto-grow v-model="comments"></v-textarea>
+										</v-container>
+										<!-- SUBMIT -->
+										<v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">
+											Validate
+										</v-btn>
+										<v-btn color="error" class="mr-4" @click="reset">
+											Reset Form
+										</v-btn>
+										<v-btn color="warning" @click="resetValidation">
+											Reset Validation
+										</v-btn>
 									</v-row>
 								</v-container>
 							</v-form>
