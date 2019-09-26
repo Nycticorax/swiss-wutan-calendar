@@ -47,9 +47,9 @@ window.onload = function () {
 				schools: ['Basel','Bern','Biel','Fribourg','Thun'],
 				// dates
 				date: new Date().toISOString().substr(0, 10),
+				refDate: new Date().toISOString().substr(0, 10),
 				menu: false,
 				pickerDate: null,
-				displayedEvents: [],
 				eventTitle: '',
 				eventLocation: '',
 				eventStart: '2019-09-29T09:00:00-07:00',
@@ -67,6 +67,12 @@ window.onload = function () {
 		created() {
 			this.api = gapi;
 			this.handleClientLoad();
+		},
+
+		computed: {
+			thisMonthEvents(){
+				return this.events.filter(e => this.refDate.substr(0,7) == e.start.dateTime.substr(0,7))
+			}
 		},
 
 		methods: {
@@ -90,6 +96,7 @@ window.onload = function () {
 				}).then(() => {
 					this.pullScheduled()
 					this.pullProposed()
+					this.pickerDate = new Date().toISOString().substr(0, 10)
 				})
 			},
 
@@ -207,10 +214,9 @@ window.onload = function () {
 				this.$refs.form.resetValidation()
 			},
 		},
-
 		watch: {
 			pickerDate(val) {
-				this.displayedEvents = this.events.filter(e => val == e.start.dateTime.toISOString().substr(0, 10))
+				this.refDate = val
 			},
 		}
 	});
