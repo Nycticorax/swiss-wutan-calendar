@@ -5,27 +5,70 @@
 	<title>Swiss Wutan's Unique Centralized Calendar Everyone Ever Wished We Had But Never Dared to Ask For</title>
 	<meta charset="utf-8" />
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-	<script src="vue_inject.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
 	<script async defer src="https://apis.google.com/js/api.js"></script>
 </head>
 
 <body>
 	<div id="app">
-		<div class='authentification'>
-			<h2>Back office</h2>
-			Authentification
-			<button v-if='!authorized' @click="handleAuthClick">Sign In</button>
-			<button v-if='authorized' @click="handleSignoutClick">Sign Out</button>
-		</div>
-		<hr>
-		<div>
-			<h3>Scheduled events</h3>{{ events }}
-			<h3>Proposed events</h3>{{ proposedEvents }}
-			<button v-if='authorized' @click="validateEvents">Validate proposed events</button>
-		</div>
-		<br />
-		<iframe src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;mode=AGENDA&amp;showTz=0&amp;showCalendars=0&amp;showTabs=1&amp;showPrint=0&amp;showDate=1&amp;showNav=1&amp;showTitle=1&amp;title=Swiss%20Wutan%20All%20Schools%20Agenda" style="border-width:0" width="793" height="600" frameborder="0" scrolling="no"></iframe>
+		<v-app>
+			<v-content>
+				<v-container>
+					<v-card>
+						<v-toolbar flat color="primary" dark>
+							<v-toolbar-title>Authenticate</v-toolbar-title>
+						</v-toolbar>
+							<v-card-actions>
+								<v-btn v-if='!authorized' @click="handleAuthClick">Log in</v-btn>
+								<v-btn v-if='authorized' @click="handleSignoutClick">Log out</v-btn>
+								<v-card-text>Required to validate events.</v-card-text>
+							</v-card-actions>
+					</v-card>
+				</v-container>
+				<v-container>
+					<v-card>
+						<v-toolbar flat color="primary" dark>
+							<v-toolbar-title>Accept events</v-toolbar-title>
+						</v-toolbar>
+						<v-tabs v-model="active_tab" vertical>
+							<v-tab key='"0"'>Proposed events</v-tab>
+							<v-tab key='"1"'>Scheduled events</v-tab>
+							<v-tab-item key='"0"'>
+								<v-card flat>
+									<v-card-text>{{ proposedEvents }}</v-card-text>
+								</v-card>
+							</v-tab-item>
+							<v-tab-item key='"1"'>
+								<v-card flat>
+									<v-card-text>{{ events }}</v-card-text>
+								</v-card>
+							</v-tab-item>
+						</v-tabs>
+						<v-card-actions>
+							<v-btn v-if='authorized' @click="validateEvents">Accept proposed events</v-btn>
+						</v-card-actions>
+					</v-card>
+				</v-container>
+				<v-container>
+					<v-card>
+						<v-toolbar flat color="primary" dark>
+							<v-toolbar-title>Check the results</v-toolbar-title>
+						</v-toolbar>
+						<v-card-text>Google Calendar doesn't accept live updates :( Please reload the page to
+							refresh</v-card-text>
+						<iframe
+							src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;mode=AGENDA&amp;showTz=0&amp;showCalendars=0&amp;showTabs=1&amp;showPrint=0&amp;showDate=1&amp;showNav=1&amp;showTitle=1&amp;title=Swiss%20Wutan%20All%20Schools%20Agenda"
+							style="border-width:0" margin-left="auto" margin-right="auto" width="793" height="600" frameborder="0" scrolling="no"></iframe>
+					</v-card>
+				</v-container>
+			</v-content>
+		</v-app>
 	</div>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+	<script src="vue_inject.js"></script>
 </body>
 
 </html>

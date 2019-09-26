@@ -11,13 +11,14 @@ const CALENDAR_ID = '3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com'
 window.onload = function () {
 	new Vue({
 		el: '#app',
-
+		vuetify: new Vuetify(),
 		data() {
 			return {
 				api: undefined,
 				authorized: false,
 				events: undefined,
 				proposedEvents: undefined,
+				active_tab: 0,
 			}
 		},
 
@@ -49,11 +50,14 @@ window.onload = function () {
 				}).then(_ => {
 					// Listen for sign-in state changes.
 					vm.api.auth2.getAuthInstance().isSignedIn.listen(vm.authorized);
-				}).then(() => this.refreshAll())
+				}).then(() => {
+					this.pullScheduled()
+					this.pullProposed()
+				})
 			},
 
       /**
-       *  Sign in the user upon button click.
+       *  Sign in
        */
 			handleAuthClick(event) {
 				Promise.resolve(this.api.auth2.getAuthInstance().signIn())
@@ -63,7 +67,7 @@ window.onload = function () {
 			},
 
       /**
-       *  Sign out the user upon button click.
+       *  Sign out
        */
 			handleSignoutClick(event) {
 				Promise.resolve(this.api.auth2.getAuthInstance().signOut())
@@ -72,11 +76,6 @@ window.onload = function () {
 					});
 			},
 
-      /**
-       * Print the summary and start datetime/date of the next ten events in
-       * the authorized user's calendar. If no events are found an
-       * appropriate message is printed.
-       */
 			validateEvents() {
 				let vm = this
 
@@ -86,12 +85,14 @@ window.onload = function () {
 						'resource': e
 					})
 					r.execute((e) => {
-						this.refreshAll()
+						this.pullScheduled()
+						this.proposedEvents = undefined
+						this.active_tab = 1
 					});	
 				});
 			},
 
-			showProposedEvents(){
+			pullProposed(){
 				this.proposedEvents = [{
 					'summary': 'Swiss Wutan Mock Event',
 					'location': 'Wudang Mountains',
@@ -107,7 +108,7 @@ window.onload = function () {
 				}]
 			},
 
-			refreshAll() {
+			pullScheduled() {
 				let vm = this;
 
 				vm.api.client.calendar.events.list({
@@ -133,31 +134,8 @@ window.onload = function () {
 						res.push('No upcoming events found.');
 					  }
 					this.events = res
-					this.showProposedEvents()
 				});
 			
-			},
-
-			syntaxHighlight(json) {
-				if (typeof json != 'string') {
-					json = JSON.stringify(json, undefined, 2);
-				}
-				json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-				return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
-					var cls = 'number';
-					if (/^"/.test(match)) {
-						if (/:$/.test(match)) {
-							cls = 'key';
-						} else {
-							cls = 'string';
-						}
-					} else if (/true|false/.test(match)) {
-						cls = 'boolean';
-					} else if (/null/.test(match)) {
-						cls = 'null';
-					}
-					return '<span class="' + cls + '">' + match + '</span>';
-				});
 			}
 		}
 	});
