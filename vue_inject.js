@@ -19,8 +19,33 @@ window.onload = function () {
 				authorized: false,
 				events: [],
 				submittedEvents: [],
+				events_headers: [
+					{
+						text: 'Scheduled events',
+						align: 'left',
+						sortable: 'true',
+						value: 'summary'
+					},
+					{ text: 'Title', value: 'summary'},
+					{ text: 'Start', value: 'start.datetime'},
+					{ text: 'End', value: 'end.datetime'}
+				],
+				search: '',
+				submittedEvents_headers: [
+					{
+						text: 'Submitted events',
+						align: 'left',
+						sortable: 'true',
+						value: 'summary'
+					},
+					{ text: 'Title', value: 'summary'},
+					{ text: 'Start', value: 'start.datetime'},
+					{ text: 'End', value: 'end.datetime'}
+				],
 				selectedSubmittedEvents: [],
 				active_tab: 1,
+				rejecting: false,
+				rejecting_why: '',
 				iframe_key: 0,
 				valid: true,
 				firstNameRules: [
@@ -148,12 +173,7 @@ window.onload = function () {
 					});
 			},
 			// Accept or reject events
-			validateEvents(verdict) {
-				if (!verdict) {
-					console.log('Denied!')
-					return
-				}
-
+			validateEvents() {
 				let vm = this
 
 				this.submittedEvents.forEach(e => {
@@ -172,7 +192,7 @@ window.onload = function () {
 			// Pull proposed events (from Firebase eventually)
 			pullSubmitted() {
 				this.submittedEvents = [{
-					'summary': 'Swiss Wutan Mock Event',
+					'summary': 'Mock Event #' + Math.floor(Math.random() * Math.floor(100)).toString(),
 					'location': 'Wudang Mountains',
 					'description': 'Running tests is boring but necessary',
 					'start': {
@@ -210,6 +230,10 @@ window.onload = function () {
 					})
 				});
 
+			},
+
+			sendRejection(){
+				console.log('rejected')
 			},
 
 			// Little hack for iframe component refresh
