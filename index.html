@@ -138,12 +138,12 @@
 							</v-tabs>
 						</v-card>
 						<v-card-actions>
-							<v-btn v-if="authorized && selectedSubmittedEvents.length > 0"
+							<v-btn v-if="authorized && selectedSubmittedEvents"
 								@click="validateEvents(true)">
 								Accept submitted event(s)</v-btn>
 							<v-btn v-else-if='authorized' @click="validateEvents(true)" disabled>Accept submitted
 								event(s)</v-btn>
-							<v-btn v-if="authorized && selectedSubmittedEvents.length > 0"
+							<v-btn v-if="authorized && selectedSubmittedEvents"
 								@click="validateEvents(false)">Reject submitted event(s)</v-btn>
 							<v-btn v-else-if='authorized' @click="validateEvents(false)" disabled>Reject submitted
 								event(s)</v-btn>
