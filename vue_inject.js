@@ -18,8 +18,8 @@ window.onload = function () {
 				api: undefined,
 				authorized: false,
 				events: [],
-				proposedEvents: [],
-				selectedProposedEvents: [],
+				submittedEvents: [],
+				selectedSubmittedEvents: [],
 				active_tab: 1,
 				iframe_key: 0,
 				valid: true,
@@ -104,7 +104,7 @@ window.onload = function () {
 					vm.api.auth2.getAuthInstance().isSignedIn.listen(vm.authorized);
 				}).then(() => {
 					this.pullScheduled()
-					this.pullProposed()
+					this.pullSubmitted()
 				})
 			},
 
@@ -133,22 +133,22 @@ window.onload = function () {
 
 				let vm = this
 
-				this.proposedEvents.forEach(e => {
+				this.submittedEvents.forEach(e => {
 					let r = vm.api.client.calendar.events.insert({
 						'calendarId': CALENDAR_ID,
 						'resource': e
 					})
 					r.execute((e) => {
 						this.pullScheduled()
-						this.proposedEvents = []
+						this.submittedEvents = []
 						this.active_tab = 1
 					});
 				});
 			},
 
 			// Pull proposed events (from Firebase eventually)
-			pullProposed() {
-				this.proposedEvents = [{
+			pullSubmitted() {
+				this.submittedEvents = [{
 					'summary': 'Swiss Wutan Mock Event',
 					'location': 'Wudang Mountains',
 					'description': 'Running tests is boring but necessary',
@@ -198,7 +198,7 @@ window.onload = function () {
 			validate() {
 				if (this.$refs.form.validate()) {
 					this.snackbar = true
-					this.proposedEvents.push({
+					this.submittedEvents.push({
 						'summary': this.eventTitle,
 						'location': this.eventLocation,
 						'description': this.comments,
