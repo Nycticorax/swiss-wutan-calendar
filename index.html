@@ -32,19 +32,19 @@
 								<a href="https://www.facebook.com/help/152652248136178/">these instructions</a> to
 								export Facebook's events to Google Calendar.</p>
 							<p>Onto the concept. It works like this.</p>
-								<ol>
-									<li>Anyone -- perhaps an individual or
-										institutional member of Swiss Wutan, but not necessarily -- can submit events to
-										the
-										SWISS WUTAN CALENDAR -- displayed here below</li>
-									<li>Submitted events don't need to be organized by Swiss Wutan or affiliates. They
-										can just be interested for our community, or for some schools, etc. It's very
-										easy with this setup to create different categories for events, and to search
-										them smoothly.</li>
-									<li>People vested with an
-										"admin" role can accept or reject events submissions. This process is explained
-										below.</li>
-								</ol>
+							<ol>
+								<li>Anyone -- perhaps an individual or
+									institutional member of Swiss Wutan, but not necessarily -- can submit events to
+									the
+									SWISS WUTAN CALENDAR -- displayed here below</li>
+								<li>Submitted events don't need to be organized by Swiss Wutan or affiliates. They
+									can just be interested for our community, or for some schools, etc. It's very
+									easy with this setup to create different categories for events, and to search
+									them smoothly.</li>
+								<li>People vested with an
+									"admin" role can accept or reject events submissions. This process is explained
+									below.</li>
+							</ol>
 							At the end of the day this removes all the bureaucratic shenanigans so that we can all
 							focus on what matters -- <em>Wutan!</em> (For the curious, source code is sleeping <a
 								href="https://github.com/Nycticorax/swiss-wutan-calendar">here</a>.)
@@ -79,77 +79,63 @@
 								<v-tab-item key="0">
 									<v-card flat>
 										<div v-if="authorized">
-											<v-simple-table v-if="submittedEvents">
-												<template v-slot:default>
-													<thead>
-														<tr>
-															<th class="text-left">Select</th>
-															<th class="text-left">Title</th>
-															<th class="text-left">Start</th>
-															<th class="text-left">End</th>
-															<th class="text-left">Location</th>
-														</tr>
-													</thead>
-													<tbody>
-														<tr v-for="pe in submittedEvents">
-															<td>
-																<v-checkbox v-model="selectedSubmittedEvents"
-																	:value="pe"></v-checkbox>
-															</td>
-															<td>{{ pe.summary }}</td>
-															<td>{{ pe.start.dateTime }}</td>
-															<td>{{ pe.end.dateTime }}</td>
-															<td>{{ pe.location }}</td>
-														</tr>
-													</tbody>
-												</template>
-											</v-simple-table>
+											<v-card-title>
+												<v-text-field v-model="search" label="Search"
+												single-line hide-details></v-text-field>
+											</v-card-title>
+											<v-data-table v-if="submittedEvents" v-model="selectedSubmittedEvents"
+											:headers="submittedEvents_headers" :items="submittedEvents" show-select
+											sort-by="['summary','start']" item-key="summary" :search="search"
+											:items-per-page="10" class="elevation-1">
+											</v-data-table>
 										</div>
 										<div v-else>
-											<v-card-text>You need to be logged in to see submitted events.</v-card-text>
+										<v-card-text>You need to be logged in to see submitted events.</v-card-text>
 										</div>
 									</v-card>
 								</v-tab-item>
 								<!-- CONFIRMED EVENTS -->
 								<v-tab-item key="1">
 									<v-card flat>
-										<v-simple-table v-if="events">
-											<template v-slot:default>
-												<thead>
-													<tr>
-														<th class="text-left">Title</th>
-														<th class="text-left">Start</th>
-														<th class="text-left">End</th>
-														<th class="text-left">Location</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr v-for="e in events">
-														<td>{{ e.summary }}</td>
-														<td>{{ e.start.dateTime }}</td>
-														<td>{{ e.end.dateTime }}</td>
-														<td>{{ e.location }}</td>
-													</tr>
-												</tbody>
-											</template>
-										</v-simple-table>
+										<v-card-title>
+											<v-text-field v-model="search" label="Search"
+											single-line hide-details></v-text-field>
+										</v-card-title>
+										<v-data-table v-if="events" :headers="events_headers" :items="events"
+											:items-per-page="10" class="elevation-1" sort-by="['summary','start']"
+											:search="search">
+										</v-data-table>
 									</v-card>
 								</v-tab-item>
 							</v-tabs>
 						</v-card>
 						<v-card-actions>
-							<v-btn v-if="authorized && selectedSubmittedEvents"
-								@click="validateEvents(true)">
+							<v-btn v-if="authorized && selectedSubmittedEvents.length > 0" @click="validateEvents()">
 								Accept submitted event(s)</v-btn>
-							<v-btn v-else-if='authorized' @click="validateEvents(true)" disabled>Accept submitted
+							<v-btn v-else-if="authorized" disabled>Accept submitted
 								event(s)</v-btn>
-							<v-btn v-if="authorized && selectedSubmittedEvents"
-								@click="validateEvents(false)">Reject submitted event(s)</v-btn>
-							<v-btn v-else-if='authorized' @click="validateEvents(false)" disabled>Reject submitted
+							<v-btn v-if="authorized && selectedSubmittedEvents.length > 0"
+								@click="rejecting = !rejecting">Reject submitted event(s)</v-btn>
+							<v-btn v-else-if='authorized' disabled>Reject submitted
 								event(s)</v-btn>
 						</v-card-actions>
 					</v-card>
+					<!-- REJECTING SUBMITTED EVENTS -->
 				</v-container>
+				<v-dialog v-if="rejecting" v-model="rejecting" persistent max-width="450">
+					<v-card>
+						<v-card-title class="headline">Explain why</v-card-title>
+						<v-textarea v-model="rejecting_why" auto-grow
+							placeholder="Please explain the submitter why you're rejecting." rows="4" row-height="30">
+						</v-textarea>
+						<v-card-actions>
+							<div class="flex-grow-1"></div>
+							<v-btn color="green darken-1" text @click="rejecting = false; sendRejection()">Confirm &
+								send</v-btn>
+							<v-btn color="orange darken-1" text @click="rejecting = false">Cancel rejection</v-btn>
+						</v-card-actions>
+					</v-card>
+				</v-dialog>
 				<v-container>
 					<v-card>
 						<v-toolbar flat color="red darken-2" dark>
@@ -170,13 +156,13 @@
 								results
 								of the newly validated events.</p>
 							<p>If you are curious here's my todo list:</p>
-								<ol>
-									<li>Accepting events & writing them into Google Calendar (done)</li>
-									<li>Storing events in in-house database</li>
-									<li>Setting up web + email notifications</li>
-									<li>Organizing event in categories and letting users subscribe for receiving
-										relevant notifications</li>
-								</ol>
+							<ol>
+								<li>Accepting events & writing them into Google Calendar (done)</li>
+								<li>Storing events in in-house database</li>
+								<li>Setting up web + email notifications</li>
+								<li>Organizing event in categories and letting users subscribe for receiving
+									relevant notifications</li>
+							</ol>
 						</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<div :key="iframe_key">
@@ -239,7 +225,7 @@
 											<br /><br />
 											<v-combobox v-model="dates" multiple chips :items="dates"
 												label="Dates picked" deletable-chips></v-combobox>
-											<v-text-field label="Time" value="event.time" type="time"></v-text-field>
+											<v-text-field label="Time" v-model="event.time" type="time"></v-text-field>
 										</v-col>
 										<!-- EVENT CONTENT -->
 										<v-col cols="12" md="6">
