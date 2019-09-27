@@ -86,7 +86,7 @@
 											</v-card-title>
 											<v-data-table v-if="submittedEvents" v-model="selectedSubmittedEvents"
 											:headers="submittedEvents_headers" :items="submittedEvents" show-select
-											sort-by="start.dateTime" sort-desc="true" item-key="summary" :search="search"
+											sort-by="start.dateTime" :sort-desc="true" item-key="summary" :search="search"
 											:items-per-page="10" class="elevation-1">
 											</v-data-table>
 										</div>
@@ -103,7 +103,7 @@
 											single-line hide-details></v-text-field>
 										</v-card-title>
 										<v-data-table v-if="events" :headers="events_headers" :items="events"
-											:items-per-page="10" class="elevation-1" sort-by="start.dateTime" sort-desc="true"
+											:items-per-page="10" class="elevation-1" sort-by="start.dateTime" :sort-desc="true"
 											:search="search">
 										</v-data-table>
 									</v-card>
