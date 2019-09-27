@@ -20,27 +20,19 @@ window.onload = function () {
 				events: [],
 				submittedEvents: [],
 				events_headers: [
-					{
-						text: 'Scheduled events',
-						align: 'left',
-						sortable: 'true',
-						value: 'summary'
-					},
-					{ text: 'Title', value: 'summary'},
-					{ text: 'Start', value: 'start.datetime'},
-					{ text: 'End', value: 'end.datetime'}
+					{ text: 'Title', value: 'summary', sortable: 'true'},
+					{ text: 'Submitted by', value: 'author', sortable: 'true'},
+					{ text: 'Category', value: 'cat', sortable: 'true'},
+					{ text: 'Start', value: 'start.dateTime', sortable: 'true'},
+					{ text: 'End', value: 'end.dateTime'},
 				],
 				search: '',
 				submittedEvents_headers: [
-					{
-						text: 'Submitted events',
-						align: 'left',
-						sortable: 'true',
-						value: 'summary'
-					},
-					{ text: 'Title', value: 'summary'},
-					{ text: 'Start', value: 'start.datetime'},
-					{ text: 'End', value: 'end.datetime'}
+					{ text: 'Title', value: 'summary', sortable: 'true'},
+					{ text: 'Submitted By', value: 'author', sortable: 'true'},
+					{ text: 'Category', value: 'cat', sortable: 'true'},
+					{ text: 'Start', value: 'start.dateTime', sortable: 'true'},
+					{ text: 'End', value: 'end.dateTime'},	
 				],
 				selectedSubmittedEvents: [],
 				active_tab: 1,
