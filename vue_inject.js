@@ -83,7 +83,7 @@ window.onload = function () {
 					location: '',
 					start: '2019-09-29T09:00:00-07:00',
 					end: '2019-09-29T09:00:00-07:00',
-					time: '',
+					time: "09:00",
 					arts: ['Bagua', 'Baji', 'Tai chi'],
 					levels: ['Beginners', 'Advanced'],
 					privacy: null,

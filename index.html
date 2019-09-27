@@ -225,7 +225,7 @@
 											<br /><br />
 											<v-combobox v-model="dates" multiple chips :items="dates"
 												label="Dates picked" deletable-chips></v-combobox>
-											<v-text-field label="Time" value="event.time" type="time"></v-text-field>
+											<v-text-field label="Time" v-model="event.time" type="time"></v-text-field>
 										</v-col>
 										<!-- EVENT CONTENT -->
 										<v-col cols="12" md="6">
