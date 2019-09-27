@@ -101,19 +101,24 @@ window.onload = function () {
 					scope: SCOPES
 				}).then(_ => {
 					// Listen for sign-in state changes.
-					vm.api.auth2.getAuthInstance().isSignedIn.listen(vm.authorized);
-				}).then(() => {
+					vm.api.auth2.getAuthInstance().isSignedIn.listen(this.setup)
+				})
+			},
+
+			setup(verdict){
+				if (verdict) {
 					this.pullScheduled()
 					this.pullSubmitted()
-				})
+					this.authorized = true;
+					this.active_tab = 0
+				}
 			},
 
 			// Sign in
 			handleAuthClick(event) {
 				Promise.resolve(this.api.auth2.getAuthInstance().signIn())
 					.then(_ => {
-						this.authorized = true;
-						this.active_tab = 0
+						this.setup()
 					});
 			},
 
