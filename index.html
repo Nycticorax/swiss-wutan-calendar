@@ -61,6 +61,7 @@
 								<v-btn v-if='!authorized' @click="handleAuthClick">Log in</v-btn>
 								<v-btn v-if='authorized' @click="handleSignoutClick">Log out</v-btn>
 							</v-card-actions>
+							<v-card-text>Acquire admin credentials here.</v-card-text>
 						</v-card>
 					</v-card>
 				</v-container>
@@ -85,7 +86,7 @@
 											</v-card-title>
 											<v-data-table v-if="submittedEvents" v-model="selectedSubmittedEvents"
 											:headers="submittedEvents_headers" :items="submittedEvents" show-select
-											sort-by="['summary','start']" item-key="summary" :search="search"
+											sort-by="start.dateTime" sort-desc="true" item-key="summary" :search="search"
 											:items-per-page="10" class="elevation-1">
 											</v-data-table>
 										</div>
@@ -102,7 +103,7 @@
 											single-line hide-details></v-text-field>
 										</v-card-title>
 										<v-data-table v-if="events" :headers="events_headers" :items="events"
-											:items-per-page="10" class="elevation-1" sort-by="['summary','start']"
+											:items-per-page="10" class="elevation-1" sort-by="start.dateTime" sort-desc="true"
 											:search="search">
 										</v-data-table>
 									</v-card>
@@ -142,27 +143,16 @@
 							<v-toolbar-title>Check the results</v-toolbar-title>
 						</v-toolbar>
 						<v-card-text>
-							<p>So that's the WUTAN CALENDAR I was talking about. It will be visible by anyone on
-								the internet -- no credentials required. Google Calendars are usually seen from their <a
-									href="https://calendar.google.com/calendar/embed?src=3mo0a639qfhs9tjc1idmu4kkus%40group.calendar.google.com&ctz=Europe%2FZurich">home
-									page</a>. I've picked Google Calendar over rivals because it
-								is easy to share, can sync up any two calendars (like, I can literally fuse my private
-								calendar with SWISS WUTAN's calendar) and is available on many different platforms --
-								Web, Android, iPhone. Finally it can
-								be easily embedded on any website supporting plain html & javascript -- such as swiss
-								wutan's very own website. It also supports custom email notifications.</p>
-							<p> If you have accepted events
-								submissions you can now hit <v-btn @click="refreshFrame">reload</v-btn> to see the
-								results
-								of the newly validated events.</p>
-							<p>If you are curious here's my todo list:</p>
-							<ol>
-								<li>Accepting events & writing them into Google Calendar (done)</li>
-								<li>Storing events in in-house database</li>
-								<li>Setting up web + email notifications</li>
-								<li>Organizing event in categories and letting users subscribe for receiving
-									relevant notifications</li>
-							</ol>
+							<p>So that's the WUTAN CALENDAR I was talking about. It's a very simple calendar visible by anyone on
+								the internet -- no credentials required. Here's its <a href="https://calendar.google.com/calendar/embed?src=3mo0a639qfhs9tjc1idmu4kkus%40group.calendar.google.com&ctz=Europe%2FZurich">home page</a>. Don't be mislead by its simplicity, however. Google Calendars have many features:</p>
+									<ol>
+										<li>can share links to expose any calendar</li>
+										<li>can link up any two calendars, so that can explose each other's events</li>
+										<li>custom email & push notifications.</li>
+										<li>available on many different platforms --
+												Web, Android, iPhone</li>
+									</ol><p>If you have accepted events submissions you can now hit <v-btn @click="refreshFrame">reload</v-btn> to see the results of the newly validated events.</p>
+				
 						</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<div :key="iframe_key">
