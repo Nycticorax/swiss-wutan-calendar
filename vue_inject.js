@@ -101,24 +101,42 @@ window.onload = function () {
 					scope: SCOPES
 				}).then(_ => {
 					// Listen for sign-in state changes.
-					vm.api.auth2.getAuthInstance().isSignedIn.listen(this.setup)
+					vm.api.auth2.getAuthInstance().isSignedIn.listen(this.updateSigninStatus)
+					// Determining Auth status
+					this.setSigninStatus()
 				})
 			},
 
-			setup(verdict){
+			updateSigninStatus(isSignedIn) {
+				this.setSigninStatus()
+			},
+
+			setSigninStatus(isSignedIn) {
+				let vm = this;
+				let user = vm.api.auth2.getAuthInstance().currentUser.get();
+				let isAuthorized = user.hasGrantedScopes(SCOPES);
+				if (isAuthorized) this.setupdown(true)
+				else this.setupdown(false)
+			},
+
+			setupdown(verdict) {
 				if (verdict) {
-					this.pullScheduled()
 					this.pullSubmitted()
 					this.authorized = true;
 					this.active_tab = 0
+				} else {
+					this.submittedEvents = []
+					this.authorized = false;
+					this.active_tab = 1
 				}
+				this.pullScheduled()
 			},
 
 			// Sign in
 			handleAuthClick(event) {
 				Promise.resolve(this.api.auth2.getAuthInstance().signIn())
 					.then(_ => {
-						this.setup()
+						this.setupdown(true)
 					});
 			},
 
@@ -126,7 +144,7 @@ window.onload = function () {
 			handleSignoutClick(event) {
 				Promise.resolve(this.api.auth2.getAuthInstance().signOut())
 					.then(_ => {
-						this.authorized = false;
+						this.setupdown(false)
 					});
 			},
 			// Accept or reject events
