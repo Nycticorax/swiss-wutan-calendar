@@ -101,7 +101,7 @@ window.onload = function () {
 					scope: SCOPES
 				}).then(_ => {
 					// Listen for sign-in state changes.
-					//vm.api.auth2.getAuthInstance().isSignedIn.listen(this.updateSigninStatus)
+					vm.api.auth2.getAuthInstance().isSignedIn.listen(this.updateSigninStatus)
 					this.setSigninStatus()
 				})
 			},
