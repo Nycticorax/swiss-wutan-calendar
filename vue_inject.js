@@ -34,7 +34,7 @@ window.onload = function () {
 					{ text: 'Start', value: 'start.dateTime', sortable: 'true'},
 					{ text: 'End', value: 'end.dateTime'},	
 				],
-				selectedSubmittedEvents: [],
+				selectedEvents: [],
 				active_tab: 1,
 				rejecting: false,
 				rejecting_why: '',
