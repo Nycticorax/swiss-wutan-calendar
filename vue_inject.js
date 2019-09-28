@@ -1,4 +1,4 @@
-/* GOOGLE CALENDAR API CLIENT CREDENTIALS */
+/* GOOGLE APIs CLIENT CREDENTIALS */
 const CLIENT_ID = '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw';
 // Array of API discovery doc URLs for APIs used by the quickstart
