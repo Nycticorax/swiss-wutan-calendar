@@ -1,4 +1,4 @@
-// Client ID and API key from the Developer Console
+/* GOOGLE CALENDAR API CLIENT CREDENTIALS */
 const CLIENT_ID = '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw';
 // Array of API discovery doc URLs for APIs used by the quickstart
@@ -7,6 +7,19 @@ const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/calendar/v
 // included, separated by spaces.
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
 const CALENDAR_ID = '3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com'
+
+/* GOOGLE FIREBASE CLIENT CREDENTIALS */
+const firebaseConfig = {
+	apiKey: "AIzaSyBn9ur32UG9DkmN74HYciXzcp7uoJ2hwuU",
+	authDomain: "main-repo.firebaseapp.com",
+	databaseURL: "https://main-repo.firebaseio.com",
+	projectId: "main-repo",
+	storageBucket: "main-repo.appspot.com",
+	messagingSenderId: "682912307930",
+	appId: "1:682912307930:web:065128b1ab322a66"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore()
 
 window.onload = function () {
 	new Vue({
@@ -129,10 +142,16 @@ window.onload = function () {
 
 			setSigninStatus(isSignedIn) {
 				let vm = this;
-				let user = vm.api.auth2.getAuthInstance().currentUser.get();
-				let isAuthorized = user.hasGrantedScopes(SCOPES);
+				let googleAuth = vm.api.auth2.getAuthInstance()
+				let currentUser = googleAuth.currentUser.get();
+				let isAuthorized = currentUser.hasGrantedScopes(SCOPES);
 				if (isAuthorized) this.setupdown(true)
 				else this.setupdown(false)
+
+				//re-uses Google auth to manually log the user in Firebase
+				let token = currentUser.getAuthResponse().id_token
+				let credential = firebase.auth.GoogleAuthProvider.credential(token)
+				return firebase.auth().signInAndRetrieveDataWithCredential(credential)
 			},
 
 			setupdown(verdict) {
