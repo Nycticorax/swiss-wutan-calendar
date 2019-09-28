@@ -30,22 +30,24 @@ window.onload = function () {
 				// operational stuff
 				api: undefined,
 				authorized: false,
+				navItems: [{ title: 'Introduction', target: '#intro' }, { title: 'Authentication', target: '#auth' }, { title: 'Manage events', target: '#manage' }, { title: 'Google Calendar', target: '#gCal' }, { title: 'Submit new events', target: '#submit' }, { title: 'Subscribe to new events', target: '#subscribe' }],
+				nav: true,
 				events: [],
 				submittedEvents: [],
 				events_headers: [
-					{ text: 'Title', value: 'summary', sortable: 'true'},
-					{ text: 'Submitted by', value: 'author', sortable: 'true'},
-					{ text: 'Category', value: 'category', sortable: 'true'},
-					{ text: 'Start', value: 'start.dateTime', sortable: 'true'},
-					{ text: 'End', value: 'end.dateTime'},
+					{ text: 'Title', value: 'summary', sortable: 'true' },
+					{ text: 'Submitted by', value: 'author', sortable: 'true' },
+					{ text: 'Category', value: 'category', sortable: 'true' },
+					{ text: 'Start', value: 'start.dateTime', sortable: 'true' },
+					{ text: 'End', value: 'end.dateTime' },
 				],
 				search: '',
 				submittedEvents_headers: [
-					{ text: 'Title', value: 'summary', sortable: 'true'},
-					{ text: 'Submitted By', value: 'submitted_by', sortable: 'true'},
-					{ text: 'Category', value: 'category', sortable: 'true'},
-					{ text: 'Start', value: 'start.dateTime', sortable: 'true'},
-					{ text: 'End', value: 'end.dateTime'},	
+					{ text: 'Title', value: 'summary', sortable: 'true' },
+					{ text: 'Submitted By', value: 'submitted_by', sortable: 'true' },
+					{ text: 'Category', value: 'category', sortable: 'true' },
+					{ text: 'Start', value: 'start.dateTime', sortable: 'true' },
+					{ text: 'End', value: 'end.dateTime' },
 				],
 				selectedEvents: [],
 				active_tab: 1,
@@ -151,12 +153,12 @@ window.onload = function () {
 				let unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
 					unsubscribe();
 					//if (!isUserEqual(currentUser, firebaseUser)) {
-						let token = currentUser.getAuthResponse().id_token
-						let credential = firebase.auth.GoogleAuthProvider.credential(token)
-						return firebase.auth().signInWithCredential(credential).catch(error => console.log(JSON.stringify(error))) 
+					let token = currentUser.getAuthResponse().id_token
+					let credential = firebase.auth.GoogleAuthProvider.credential(token)
+					return firebase.auth().signInWithCredential(credential).catch(error => console.log(JSON.stringify(error)))
 					//}
 				})
-				 
+
 			},
 
 			setupdown(verdict) {
@@ -190,13 +192,13 @@ window.onload = function () {
 			},
 
 			// Pull submitted events from firestore
-			pullSubmittedEvents(){
+			pullSubmittedEvents() {
 				return db.collection('swiss-wutan-submitted-events').get()
-				.then(snap => this.submittedEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } )))
-				.catch(err => console.log(JSON.stringify(err)))
+					.then(snap => this.submittedEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+					.catch(err => console.log(JSON.stringify(err)))
 			},
 
-			pushSubmittedEvents(accepted){
+			pushSubmittedEvents(accepted) {
 				return db.collection('swiss-wutan-calendar-beta')
 			},
 
@@ -243,7 +245,7 @@ window.onload = function () {
 
 			},
 
-			sendRejection(){
+			sendRejection() {
 				console.log('rejected')
 			},
 

@@ -13,10 +13,29 @@
 <body>
 	<div id="app">
 		<v-app>
+			<!-- NAV -->
+			<v-card style="position: fixed; right:0; margin:0; padding:0; z-index:9999">
+				<v-navigation-drawer v-model="nav" :mini-variant.sync="nav" permanent>
+					<v-list-item>
+						<v-list-item-title>NAV</v-list-item-title>
+						<v-btn icon @click.stop="nav = !nav">
+							<v-icon>mdi-chevron-left</v-icon>
+						</v-btn>
+					</v-list-item>
+					<v-divider></v-divider>
+					<v-list dense rounded>
+						<v-list-item v-for="i in navItems" :key="i.name" link>
+							<v-list-item-content>
+								<v-list-item-title @click="$vuetify.goTo(i.target)">{{ i.title }}</v-list-item-title>
+							</v-list-item-content>
+						</v-list-item>
+					</v-list>
+				</v-navigation-drawer>
+			</v-card>
 			<v-content>
 				<v-container>
 					<v-card>
-						<v-toolbar flat color="red darken-2" dark>
+						<v-toolbar id="intro" flat color="red darken-2" dark>
 							<v-toolbar-title>Introduction</v-toolbar-title>
 						</v-toolbar>
 						<v-card-text>
@@ -52,7 +71,7 @@
 				</v-container>
 				<v-container>
 					<v-card>
-						<v-toolbar flat color="red darken-2" dark>
+						<v-toolbar id="auth" flat color="red darken-2" dark>
 							<v-toolbar-title>Authenticate on Google Calendar</v-toolbar-title>
 						</v-toolbar>
 						<v-card class="d-flex pa-2" outlined tile>
@@ -66,7 +85,7 @@
 				</v-container>
 				<v-container>
 					<v-card>
-						<v-toolbar flat color="red darken-2" dark>
+						<v-toolbar id="manage" flat color="red darken-2" dark>
 							<v-toolbar-title>Accept or reject events submissions</v-toolbar-title>
 						</v-toolbar>
 						<v-card-text>This section lets you switch between events submitted but not yet
@@ -101,8 +120,8 @@
 											<v-text-field v-model="search" label="Search" single-line hide-details>
 											</v-text-field>
 										</v-card-title>
-										<v-data-table v-if="events" v-model="selectedEvents" :headers="events_headers" :items="events"
-											show-select :items-per-page="10" class="elevation-1"
+										<v-data-table v-if="events" v-model="selectedEvents" :headers="events_headers"
+											:items="events" show-select :items-per-page="10" class="elevation-1"
 											sort-by="start.dateTime" :sort-desc="true" item-key="id" :search="search">
 										</v-data-table>
 									</v-card>
@@ -110,31 +129,31 @@
 							</v-tabs>
 						</v-card>
 						<!-- ON DISPLAY -->
-						<div v-if="selectedEvents.length > 0">
-						<v-divider></v-divider>
-						<v-card v-for="se in selectedEvents" :key="se.id" class="mx-auto" tile>
-							<v-card-title>{{se.summary}}</v-card-title>
-							<v-list-item>
-								<v-list-item-content>
-									<v-list-item-title>{{ se.author || "author" }}</v-list-item-title>
-								</v-list-item-content>
-							</v-list-item>
-							<v-list-item>
+						<div id="subscribe" v-if="selectedEvents.length > 0">
+							<v-divider></v-divider>
+							<v-card v-for="se in selectedEvents" :key="se.id" class="mx-auto" tile>
+								<v-card-title>{{se.summary}}</v-card-title>
+								<v-list-item>
+									<v-list-item-content>
+										<v-list-item-title>{{ se.author || "author" }}</v-list-item-title>
+									</v-list-item-content>
+								</v-list-item>
+								<v-list-item>
 									<v-list-item-content>
 										<v-list-item-title>{{se.start.dateTime}}</v-list-item-title>
 									</v-list-item-content>
-							</v-list-item>
-							<v-list-item>
+								</v-list-item>
+								<v-list-item>
 									<v-list-item-content>
 										<v-list-item-title>{{se.end.dateTime || "no end specified"}}</v-list-item-title>
 									</v-list-item-content>
-							</v-list-item>
-							<v-list-item>
+								</v-list-item>
+								<v-list-item>
 									<v-list-item-content>
 										<v-list-item-title>{{se.location || "Wudan Mountains"}}</v-list-item-title>
 									</v-list-item-content>
-							</v-list-item>
-						</v-card>
+								</v-list-item>
+							</v-card>
 						</div>
 						<!-- ACCEPT / REJECT -->
 						<v-card-actions>
@@ -166,7 +185,7 @@
 				</v-dialog>
 				<v-container>
 					<v-card>
-						<v-toolbar flat color="red darken-2" dark>
+						<v-toolbar id="gCal" flat color="red darken-2" dark>
 							<v-toolbar-title>Check the results</v-toolbar-title>
 						</v-toolbar>
 						<v-card-text>
@@ -199,7 +218,7 @@
 				</v-container>
 				<v-container>
 					<v-card>
-						<v-toolbar flat color="red darken-2" dark>
+						<v-toolbar id="submit" flat color="red darken-2" dark>
 							<v-toolbar-title>Submit new events</v-toolbar-title>
 						</v-toolbar>
 						<v-card-text>By contrast to the other sections of the page, this one will be visible to anyone
