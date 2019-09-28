@@ -8,7 +8,6 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-	<script async defer src="https://apis.google.com/js/api.js"></script>
 </head>
 
 <body>
@@ -86,7 +85,7 @@
 											</v-card-title>
 											<v-data-table v-if="submittedEvents" v-model="selectedEvents"
 												:headers="submittedEvents_headers" :items="submittedEvents" show-select
-												sort-by="start.dateTime" :sort-desc="true" item-key="summary"
+												sort-by="start.dateTime" :sort-desc="true" item-key="id"
 												:search="search" :items-per-page="10" class="elevation-1">
 											</v-data-table>
 										</div>
@@ -104,7 +103,7 @@
 										</v-card-title>
 										<v-data-table v-if="events" v-model="selectedEvents" :headers="events_headers" :items="events"
 											show-select :items-per-page="10" class="elevation-1"
-											sort-by="start.dateTime" :sort-desc="true" item-key="summary" :search="search">
+											sort-by="start.dateTime" :sort-desc="true" item-key="id" :search="search">
 										</v-data-table>
 									</v-card>
 								</v-tab-item>
@@ -113,7 +112,7 @@
 						<!-- ON DISPLAY -->
 						<div v-if="selectedEvents.length > 0">
 						<v-divider></v-divider>
-						<v-card v-for="se in selectedEvents" class="mx-auto" tile>
+						<v-card v-for="se in selectedEvents" :key="se.id" class="mx-auto" tile>
 							<v-card-title>{{se.summary}}</v-card-title>
 							<v-list-item>
 								<v-list-item-content>
@@ -314,9 +313,10 @@
 	<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 	<!-- FIREBASE & FIRESTORE-->
 	<script src="https://www.gstatic.com/firebasejs/7.0.0/firebase-app.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/7.0.0/firebase-auth.js"></script>
-	<script src="https://cdn.firebase.com/libs/firebaseui/4.2.0/firebaseui.js"></script>
+	<script async defer src="https://www.gstatic.com/firebasejs/7.0.0/firebase-auth.js"></script>
+	<script async defer src="https://cdn.firebase.com/libs/firebaseui/4.2.0/firebaseui.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/7.0.0/firebase-firestore.js"></script>
+	<script async defer src="https://apis.google.com/js/api.js"></script>
 	<script src="vue_inject.js"></script>
 </body>
 

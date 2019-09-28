@@ -5,7 +5,7 @@ const API_KEY = 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw';
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'];
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-const SCOPES = 'https://www.googleapis.com/auth/calendar';
+const SCOPES = 'https://www.googleapis.com/auth/calendar'//, 'https://www.googleapis.com/auth/cloud-platform'];
 const CALENDAR_ID = '3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com'
 
 /* GOOGLE FIREBASE CLIENT CREDENTIALS */
@@ -35,15 +35,15 @@ window.onload = function () {
 				events_headers: [
 					{ text: 'Title', value: 'summary', sortable: 'true'},
 					{ text: 'Submitted by', value: 'author', sortable: 'true'},
-					{ text: 'Category', value: 'cat', sortable: 'true'},
+					{ text: 'Category', value: 'category', sortable: 'true'},
 					{ text: 'Start', value: 'start.dateTime', sortable: 'true'},
 					{ text: 'End', value: 'end.dateTime'},
 				],
 				search: '',
 				submittedEvents_headers: [
 					{ text: 'Title', value: 'summary', sortable: 'true'},
-					{ text: 'Submitted By', value: 'author', sortable: 'true'},
-					{ text: 'Category', value: 'cat', sortable: 'true'},
+					{ text: 'Submitted By', value: 'submitted_by', sortable: 'true'},
+					{ text: 'Category', value: 'category', sortable: 'true'},
 					{ text: 'Start', value: 'start.dateTime', sortable: 'true'},
 					{ text: 'End', value: 'end.dateTime'},	
 				],
@@ -147,18 +147,24 @@ window.onload = function () {
 				let isAuthorized = currentUser.hasGrantedScopes(SCOPES);
 				if (isAuthorized) this.setupdown(true)
 				else this.setupdown(false)
-
-				//re-uses Google auth to manually log the user in Firebase
-				let token = currentUser.getAuthResponse().id_token
-				let credential = firebase.auth.GoogleAuthProvider.credential(token)
-				return firebase.auth().signInWithCredential(credential).catch(error => console.log(JSON.stringify(error)))
+				//re-uses Google auth to manually log the user into Firebase
+				let unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
+					unsubscribe();
+					//if (!isUserEqual(currentUser, firebaseUser)) {
+						let token = currentUser.getAuthResponse().id_token
+						let credential = firebase.auth.GoogleAuthProvider.credential(token)
+						return firebase.auth().signInWithCredential(credential).catch(error => console.log(JSON.stringify(error))) 
+					//}
+				})
+				 
 			},
 
 			setupdown(verdict) {
 				if (verdict) {
-					this.pullSubmitted()
-					this.authorized = true;
-					this.active_tab = 0
+					this.pullSubmittedEvents().then(() => {
+						this.authorized = true;
+						this.active_tab = 0
+					})
 				} else {
 					this.submittedEvents = []
 					this.authorized = false;
@@ -182,6 +188,18 @@ window.onload = function () {
 						this.setupdown(false)
 					});
 			},
+
+			// Pull submitted events from firestore
+			pullSubmittedEvents(){
+				return db.collection('swiss-wutan-submitted-events').get()
+				.then(snap => this.submittedEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } )))
+				.catch(err => console.log(JSON.stringify(err)))
+			},
+
+			pushSubmittedEvents(accepted){
+				return db.collection('swiss-wutan-calendar-beta')
+			},
+
 			// Accept or reject events
 			validateEvents() {
 				let vm = this
@@ -199,28 +217,11 @@ window.onload = function () {
 				});
 			},
 
-			// Pull proposed events (from Firebase eventually)
-			pullSubmitted() {
-				this.submittedEvents = [{
-					'summary': 'Mock Event #' + Math.floor(Math.random() * Math.floor(100)).toString(),
-					'location': 'Wudang Mountains',
-					'description': 'Running tests is boring but necessary',
-					'start': {
-						'dateTime': '2019-09-29T09:00:00-07:00',
-						'timeZone': 'Europe/Zurich'
-					},
-					'end': {
-						'dateTime': '2019-09-29T17:00:00-07:00',
-						'timeZone': 'Europe/Zurich'
-					}
-				}]
-			},
-
 			// Fetch events from Calendar API
 			pullScheduled() {
 				let vm = this;
 
-				vm.api.client.calendar.events.list({
+				return vm.api.client.calendar.events.list({
 					'calendarId': CALENDAR_ID,
 					'timeMin': (new Date()).toISOString(),
 					'showDeleted': false,
@@ -228,9 +229,9 @@ window.onload = function () {
 					'maxResults': 10,
 					'orderBy': 'startTime'
 				}).then(response => {
-					let events = response.result.items;
-					this.events = events.map(e => {
+					this.events = response.result.items.map(e => {
 						return {
+							'id': Math.floor(Math.random() * Math.floor(1000)).toString(),
 							'summary': e.summary,
 							'description': e.description,
 							'location': e.location,
