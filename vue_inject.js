@@ -151,7 +151,7 @@ window.onload = function () {
 				//re-uses Google auth to manually log the user in Firebase
 				let token = currentUser.getAuthResponse().id_token
 				let credential = firebase.auth.GoogleAuthProvider.credential(token)
-				return firebase.auth().signInAndRetrieveDataWithCredential(credential)
+				return firebase.auth().signInWithCredential(credential).catch(error => console.log(JSON.stringify(error)))
 			},
 
 			setupdown(verdict) {
