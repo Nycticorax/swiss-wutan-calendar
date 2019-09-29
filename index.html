@@ -337,26 +337,35 @@
 						<v-card-text>Here users can manage their subscriptions to 'channels', namely categories or
 							topics about which they want to be notified. Notificiations can be via email, web push, or
 							push. Play around to see them in action.</v-card-text>
-							<v-divider></v-divider>
-							<v-form>
-								<v-container>
-									<v-row>
-										<v-col cols="12" md="4">
-											<v-text-field v-if="locked" v-model="emailNotif" readonly outlined filled label="Email" :placeholder="userEmail || emailNotif || ''" @click:append-outer="lockUnlock" append-outer-icon="mdi-lock-reset"></v-text-field>
-											<v-text-field v-else v-model="emailNotif" outlined label="Email" :placeholder="userEmail || emailNotif || 'Your email'" @click:append-outer="lockUnlock" append-outer-icon="mdi-lock-reset"></v-text-field>
-										</v-col>
-										<v-col cols="12" md="4">
-											<v-combobox v-model="notifs" :items="notifs_opts" multiple chips deletable-chips label="Notifications"></v-combobox>
-										</v-col>
-										<v-col cols="12" md="4">
-											<v-btn class="ma-2" outlined text color="primary">Test email</v-btn>
-											<v-btn class="ma-2" outlined text color="primary">Test web push</v-btn>
-										</v-col>
-									</v-row>
-									<v-btn color="success" @click="subUnsub(true)">Subscribe</v-btn>
-									<v-btn color="error" @click="subUnsub(false)">Unsubscribe</v-btn>
-								</v-container>
-							</v-form>
+						<v-divider></v-divider>
+						<v-form>
+							<v-container>
+								<v-row>
+									<v-col cols="12" md="4">
+										<v-text-field v-if="locked" v-model="emailNotif" readonly outlined filled
+											label="Email" :placeholder="userEmail || emailNotif || ''"
+											@click:append-outer="lockUnlock" append-outer-icon="mdi-lock-reset">
+										</v-text-field>
+										<v-text-field v-else v-model="emailNotif" outlined label="Email"
+											:placeholder="userEmail || emailNotif || 'Your email'"
+											@click:append-outer="lockUnlock" append-outer-icon="mdi-lock-reset">
+										</v-text-field>
+									</v-col>
+									<v-col cols="12" md="4">
+										<v-combobox v-model="notifs_prefs" :items="notifs_opts" multiple chips
+											deletable-chips label="Notifications"></v-combobox>
+									</v-col>
+									<v-col cols="12" md="4">
+										<v-btn class="ma-2" outlined text color="primary">Test email</v-btn>
+										<v-btn class="ma-2" outlined text color="primary">Test web push</v-btn>
+									</v-col>
+								</v-row>
+								<v-btn v-if="emailNotif !== userEmail" color="success" @click="subUnsub(true)">Subscribe</v-btn>
+								<v-btn v-else disabled color="success" @click="subUnsub(true)">Subscribe</v-btn>
+								<v-btn v-if="emailNotif === userEmail" color="error" @click="subUnsub(false)">Unsubscribe</v-btn>
+								<v-btn v-else disabled color="error" @click="subUnsub(false)">Unsubscribe</v-btn>
+							</v-container>
+						</v-form>
 					</v-card>
 				</v-container>
 			</v-content>

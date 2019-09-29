@@ -105,7 +105,7 @@ window.onload = function () {
 				fillFrom_opts: ['fill from email', 'fill from phone', 'fill from school'],
 				emailNotif: '',
 				locked: false,
-				notifs: ['Email', 'Web push'],
+				notifs_prefs: ['Email', 'Web push'],
 				notifs_opts: ['Email', 'Web push'],
 			}
 		},
@@ -119,7 +119,7 @@ window.onload = function () {
 			thisMonthEvents() {
 				return this.events.filter(e => this.refDate.substr(0, 7) == e.start.dateTime.substr(0, 7))
 			},
-			locker(){
+			locker() {
 				return this.locked ? 'Unlock email address' : 'Lock email address'
 			}
 		},
@@ -155,21 +155,31 @@ window.onload = function () {
 				let googleAuth = vm.api.auth2.getAuthInstance()
 				let currentUser = googleAuth.currentUser.get();
 
-				 //fetching en passant Google account email & modifying UI as appropriate
+				// fetching en passant Google account email & modifying UI as appropriate
 				this.userEmail = currentUser.getBasicProfile().getEmail()
 				this.locked = true
+				this.emailNotif = this.userEmail
 
 				let isAuthorized = currentUser.hasGrantedScopes(SCOPES);
 				if (isAuthorized) this.setupdown(true)
 				else this.setupdown(false)
-				
-				//re-uses Google auth to manually log the user into Firebase
+
+				// re-uses Google auth to manually log the user into Firebase
 				let unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
 					unsubscribe();
 					//if (!isUserEqual(currentUser, firebaseUser)) {
 					let token = currentUser.getAuthResponse().id_token
 					let credential = firebase.auth.GoogleAuthProvider.credential(token)
-					return firebase.auth().signInWithCredential(credential).catch(error => console.log(JSON.stringify(error)))
+
+					// loggin into firebase & checking if user is already subscribed, responding as appropriate
+					let userRef = db.collection('swiss-wutan-subscribed').doc(this.userEmail)
+					firebase.auth().signInWithCredential(credential)
+						.catch(error => console.log(JSON.stringify(error)))
+						.then(() => userRef.get())
+						.then(doc => {
+							if (!doc.exists) userRef.set({ 'email': this.userEmail, 'created_on': firebase.firestore.FieldValue.serverTimestamp() })
+							else if (doc.data().notifs_prefs) this.notifs_prefs = doc.data().notifs_prefs
+						})
 					//}
 				})
 
@@ -213,7 +223,7 @@ window.onload = function () {
 			},
 
 			pushSubmittedEvents(accepted) {
-				return db.collection('swiss-wutan-calendar-beta')
+				return db.collection('...')
 			},
 
 			// Accept or reject events
@@ -296,11 +306,11 @@ window.onload = function () {
 				this.$refs.form.resetValidation()
 			},
 
-			lockUnlock(){
-				this.locked ? this.locked = false : this.locked = true 
+			lockUnlock() {
+				this.locked ? this.locked = false : this.locked = true
 			},
 
-			subUnsub(verdict){
+			subUnsub(verdict) {
 				return
 			}
 		},
