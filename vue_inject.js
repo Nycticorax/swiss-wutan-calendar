@@ -172,7 +172,17 @@ window.onload = function () {
 				// re-uses Google auth to manually log the user into Firebase
 				let unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
 					unsubscribe();
-					//if (!isUserEqual(currentUser, firebaseUser)) {
+					
+					if (firebaseUser) {
+						let providerData = firebaseUser.providerData;
+						for (let i = 0; i < providerData.length; i++) {
+						  if (providerData[i].providerId === firebase.auth.GoogleAuthProvider.PROVIDER_ID &&
+							  providerData[i].uid === currentUser.getBasicProfile().getId()) {
+								  return true;
+						  }
+						}
+					  }
+
 					let token = currentUser.getAuthResponse().id_token
 					let credential = firebase.auth.GoogleAuthProvider.credential(token)
 
