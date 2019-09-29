@@ -343,11 +343,11 @@
 								<v-row>
 									<v-col cols="12" md="4">
 										<v-text-field v-if="locked" v-model="emailNotif" readonly outlined filled
-											label="Email" :placeholder="userEmail || emailNotif || ''"
+											label="Email" :placeholder="gUserEmail || emailNotif || ''"
 											@click:append-outer="lockUnlock" append-outer-icon="mdi-lock-reset">
 										</v-text-field>
 										<v-text-field v-else v-model="emailNotif" outlined label="Email"
-											:placeholder="userEmail || emailNotif || 'Your email'"
+											:placeholder="gUserEmail || emailNotif || 'Your email'"
 											@click:append-outer="lockUnlock" append-outer-icon="mdi-lock-reset">
 										</v-text-field>
 									</v-col>
@@ -357,18 +357,23 @@
 									</v-col>
 									<v-col cols="12" md="4">
 										<v-btn class="ma-2" outlined text color="primary">Test email</v-btn>
-										<v-btn class="ma-2" outlined text color="primary">Test web push</v-btn>
+										<v-btn class="ma-2" outlined text color="primary" @click="testPush">Test web push</v-btn>
 									</v-col>
 								</v-row>
-								<v-btn v-if="emailNotif !== userEmail" color="success" @click="subUnsub(true)">Subscribe</v-btn>
+								<v-btn v-if="emailNotif !== gUserEmail" color="success" @click="subUnsub(true)">Subscribe</v-btn>
 								<v-btn v-else disabled color="success" @click="subUnsub(true)">Subscribe</v-btn>
-								<v-btn v-if="emailNotif === userEmail" color="error" @click="subUnsub(false)">Unsubscribe</v-btn>
+								<v-btn v-if="emailNotif === gUserEmail" color="error" @click="subUnsub(false)">Unsubscribe</v-btn>
 								<v-btn v-else disabled color="error" @click="subUnsub(false)">Unsubscribe</v-btn>
 							</v-container>
 						</v-form>
 					</v-card>
 				</v-container>
 			</v-content>
+				<v-snackbar v-if="newNotif" v-model="snackbar">{{ newNotif }}
+					<v-btn color="pink" text @click="snackbar = false">
+					Close
+				</v-btn>
+				</v-snackbar>
 		</v-app>
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
@@ -377,6 +382,8 @@
 	<script src="https://www.gstatic.com/firebasejs/7.0.0/firebase-app.js"></script>
 	<script async defer src="https://www.gstatic.com/firebasejs/7.0.0/firebase-auth.js"></script>
 	<script async defer src="https://cdn.firebase.com/libs/firebaseui/4.2.0/firebaseui.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/6.3.4/firebase-messaging.js"></script>
+	<!--<script async defer src="firebase-messaging-sw.js"></script>-->
 	<script src="https://www.gstatic.com/firebasejs/7.0.0/firebase-firestore.js"></script>
 	<script async defer src="https://apis.google.com/js/api.js"></script>
 	<script src="vue_inject.js"></script>

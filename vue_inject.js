@@ -21,6 +21,9 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore()
 
+/* GOOGLE FIREBASE MESSAGING */
+const messaging = firebase.messaging()
+
 window.onload = function () {
 	new Vue({
 		el: '#app',
@@ -29,7 +32,8 @@ window.onload = function () {
 			return {
 				// operational stuff
 				api: undefined,
-				userEmail: '',
+				gUserEmail: '',
+				token: '',
 				authorized: false,
 				navItems: [{ title: 'Introduction', target: '#intro' }, { title: 'Authentication', target: '#auth' }, { title: 'Manage events', target: '#manage' }, { title: 'Google Calendar', target: '#gCal' }, { title: 'Submit new events', target: '#submit' }, { title: 'Subscribe to new events', target: '#subscribe' }],
 				nav: true,
@@ -107,12 +111,15 @@ window.onload = function () {
 				locked: false,
 				notifs_prefs: ['Email', 'Web push'],
 				notifs_opts: ['Email', 'Web push'],
+				snackbar: false,
+				newNotif: '',
 			}
 		},
 
 		created() {
 			this.api = gapi;
-			this.handleClientLoad();
+			this.handleClientLoad()
+			this.initMessaging()
 		},
 
 		computed: {
@@ -156,9 +163,9 @@ window.onload = function () {
 				let currentUser = googleAuth.currentUser.get();
 
 				// fetching en passant Google account email & modifying UI as appropriate
-				this.userEmail = currentUser.getBasicProfile().getEmail()
+				this.gUserEmail = currentUser.getBasicProfile().getEmail()
 				this.locked = true
-				this.emailNotif = this.userEmail
+				this.emailNotif = this.gUserEmail
 
 				let isAuthorized = currentUser.hasGrantedScopes(SCOPES);
 				if (isAuthorized) this.setupdown(true)
@@ -172,12 +179,12 @@ window.onload = function () {
 					let credential = firebase.auth.GoogleAuthProvider.credential(token)
 
 					// loggin into firebase & checking if user is already subscribed, responding as appropriate
-					let userRef = db.collection('swiss-wutan-subscribed').doc(this.userEmail)
-					firebase.auth().signInWithCredential(credential)
+					let userRef = db.collection('swiss-wutan-subscribed').doc(this.gUserEmail)
+					return firebase.auth().signInWithCredential(credential)
 						.catch(error => console.log(JSON.stringify(error)))
 						.then(() => userRef.get())
 						.then(doc => {
-							if (!doc.exists) userRef.set({ 'email': this.userEmail, 'created_on': firebase.firestore.FieldValue.serverTimestamp() })
+							if (!doc.exists) userRef.set({ 'email': this.gUserEmail, 'created_on': firebase.firestore.FieldValue.serverTimestamp() })
 							else if (doc.data().notifs_prefs) this.notifs_prefs = doc.data().notifs_prefs
 						})
 					//}
@@ -213,6 +220,25 @@ window.onload = function () {
 					.then(_ => {
 						this.setupdown(false)
 					});
+			},
+
+			initMessaging() {
+				messaging.usePublicVapidKey("BJV_rKOrznrxId6JaxqYzlt7HcHjCK-c5S4062SL-dCqDtDkFs5fxifKdAtSyy3OIovPzhRC_O33reZbzBa1O6E");
+				messaging.onTokenRefresh(() => {
+					messaging.getToken().then((refreshedToken) => {
+						console.log('Token refreshed.');
+						db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({ 'push_token': refreshedToken })
+					}).catch((err) => {
+						console.log('Unable to retrieve refreshed token ', err);
+						showToken('Unable to retrieve refreshed token ', err);
+					});
+				});
+
+				messaging.onMessage((payload) => {
+					this.newNotif = payload['notification']['title'] + '\n' + payload['notification']['body']
+					this.snackbar = true
+				});
+
 			},
 
 			// Pull submitted events from firestore
@@ -312,7 +338,64 @@ window.onload = function () {
 
 			subUnsub(verdict) {
 				return
-			}
+			},
+
+			testPush() {
+				Notification.requestPermission().then((permission) => {
+					if (permission === 'granted') {
+						console.log('Notification permission granted.');
+						// Get Instance ID token. Initially this makes a network call, once retrieved
+						// subsequent calls to getToken will return from cache.
+						messaging.getToken().then((currentToken) => {
+							if (currentToken) {
+								//db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({ 'push_token': currentToken })
+								return this.sendPush(currentToken)
+								//updateUIForPushEnabled(currentToken);
+							} else {
+								console.log('No Instance ID token available. Request permission to generate one.');
+								//updateUIForPushPermissionRequired();
+								//setTokenSentToServer(false);*/
+								console.log('Got this token', currentToken)
+							}
+						}).catch((err) => {
+							console.log('An error occurred while retrieving token. ', err);
+							console.error('Error retrieving Instance ID token. ', err);
+							//setTokenSentToServer(false);
+						});
+
+					} else {
+						console.log('Unable to get permission to notify.');
+					}
+				})
+			},
+
+			sendPush(token){
+				let key = 'AAAAnwC-2to:APA91bG4Ehb9g8Gt7vjMyqO5-S5EL8XD0ZpJaEWXpHF6wm2AusPieTcSjfvO_ya6izP7cU5L0CWV1xs3eeS-rhg0TERFowF_0QZtyYLSzMfvdyM6NRQG9ncR-oUXHg_IpO1YuNttWtYN';
+				let notification = {
+					'title': 'You have the KUNG-FU!',
+					'body': 'Yet, your journey is only beginning',
+					'click_action': 'https://swiss-wutan-calendar-beta.netlify.com/'
+				};
+
+				fetch('https://fcm.googleapis.com/fcm/send', {
+					'method': 'POST',
+					'headers': {
+						'Authorization': 'key=' + key,
+						'Content-Type': 'application/json'
+					},
+					'body': JSON.stringify({
+					'notification': notification,
+					'to': token
+					})
+				}).then(function(response) {
+					console.log(response);
+				}).catch(function(error) {
+					console.error(error);
+				})
+			
+			},
+
+
 		},
 		watch: {
 			pickerDate(val) {
