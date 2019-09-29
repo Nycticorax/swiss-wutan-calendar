@@ -1,3 +1,5 @@
+const t0 = performance.now()
+
 /* GOOGLE APIs CLIENT CREDENTIALS */
 const CLIENT_ID = '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw';
@@ -122,6 +124,10 @@ window.onload = function () {
 			this.api = gapi;
 			this.handleClientLoad()
 			this.initMessaging()
+		},
+
+		mounted(){
+			console.log('Loaded in (sec)',performance.now()-t0)
 		},
 
 		computed: {
