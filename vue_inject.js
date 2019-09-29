@@ -154,7 +154,11 @@ window.onload = function () {
 				let vm = this;
 				let googleAuth = vm.api.auth2.getAuthInstance()
 				let currentUser = googleAuth.currentUser.get();
-				this.userEmail = currentUser.getBasicProfile().getEmail() 
+
+				 //fetching en passant Google account email & modifying UI as appropriate
+				this.userEmail = currentUser.getBasicProfile().getEmail()
+				this.locked = true
+
 				let isAuthorized = currentUser.hasGrantedScopes(SCOPES);
 				if (isAuthorized) this.setupdown(true)
 				else this.setupdown(false)
