@@ -108,8 +108,10 @@ window.onload = function () {
 				levels_opts: ['Beginners', 'Advanced'],
 				fillFrom_opts: ['fill from email', 'fill from phone', 'fill from school'],
 				emailNotif: '',
+				topics_opts: ['Wutan Official', 'CH Seminars', 'TW Seminars'],
+				topics: ['Wutan Official', 'CH Seminars', 'TW Seminars'],
 				locked: false,
-				notifs_prefs: ['Email', 'Web push'],
+				notif_prefs: ['Email', 'Web push'],
 				notifs_opts: ['Email', 'Web push'],
 				snackbar: false,
 				newNotif: '',
@@ -185,7 +187,7 @@ window.onload = function () {
 						.then(() => userRef.get())
 						.then(doc => {
 							if (!doc.exists) userRef.set({ 'email': this.gUserEmail, 'created_on': firebase.firestore.FieldValue.serverTimestamp() })
-							else if (doc.data().notifs_prefs) this.notifs_prefs = doc.data().notifs_prefs
+							else if (doc.data().notif_prefs) this.notif_prefs = doc.data().notif_prefs
 						})
 					//}
 				})
@@ -337,7 +339,12 @@ window.onload = function () {
 			},
 
 			subUnsub(verdict) {
-				return
+				let email = verdict ? this.emailNotif : this.gUserEmail
+				db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({
+					'notif_prefs': this.notif_prefs,
+					'email': email,
+					'topics': this.topics
+				})
 			},
 
 			testPush() {

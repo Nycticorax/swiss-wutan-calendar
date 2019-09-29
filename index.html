@@ -352,11 +352,13 @@
 										</v-text-field>
 									</v-col>
 									<v-col cols="12" md="4">
-										<v-combobox v-model="notifs_prefs" :items="notifs_opts" multiple chips
+										<v-combobox v-model="notif_prefs" :items="notifs_opts" multiple chips
 											deletable-chips label="Notifications"></v-combobox>
 									</v-col>
 									<v-col cols="12" md="4">
-										<v-btn class="ma-2" outlined text color="primary">Test email</v-btn>
+										<v-combobox v-model="topics" multiple chips :items="topics_opts"
+										label="Topics" deletable-chips></v-combobox>
+										<v-btn class="ma-2" outlined text color="primary" disabled>Test email</v-btn>
 										<v-btn class="ma-2" outlined text color="primary" @click="testPush">Test web push</v-btn>
 									</v-col>
 								</v-row>
