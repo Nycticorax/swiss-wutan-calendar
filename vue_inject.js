@@ -127,7 +127,7 @@ window.onload = function () {
 		},
 
 		mounted(){
-			console.log('Loading in (sec)',performance.now()-t0)
+			console.log('Loaded in (sec)',performance.now()-t0)
 		},
 
 		computed: {
