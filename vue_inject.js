@@ -29,6 +29,7 @@ window.onload = function () {
 			return {
 				// operational stuff
 				api: undefined,
+				userEmail: '',
 				authorized: false,
 				navItems: [{ title: 'Introduction', target: '#intro' }, { title: 'Authentication', target: '#auth' }, { title: 'Manage events', target: '#manage' }, { title: 'Google Calendar', target: '#gCal' }, { title: 'Submit new events', target: '#submit' }, { title: 'Subscribe to new events', target: '#subscribe' }],
 				nav: true,
@@ -101,7 +102,11 @@ window.onload = function () {
 				},
 				arts_opts: ['Bagua', 'Baji', 'Tai chi', 'Kung Fu', 'Mizongyi', 'Xing Yi'],
 				levels_opts: ['Beginners', 'Advanced'],
-				fillFrom_opts: ['fill from email', 'fill from phone', 'fill from school']
+				fillFrom_opts: ['fill from email', 'fill from phone', 'fill from school'],
+				emailNotif: '',
+				locked: false,
+				notifs: ['Email', 'Web push'],
+				notifs_opts: ['Email', 'Web push'],
 			}
 		},
 
@@ -113,6 +118,9 @@ window.onload = function () {
 		computed: {
 			thisMonthEvents() {
 				return this.events.filter(e => this.refDate.substr(0, 7) == e.start.dateTime.substr(0, 7))
+			},
+			locker(){
+				return this.locked ? 'Unlock email address' : 'Lock email address'
 			}
 		},
 
@@ -146,9 +154,11 @@ window.onload = function () {
 				let vm = this;
 				let googleAuth = vm.api.auth2.getAuthInstance()
 				let currentUser = googleAuth.currentUser.get();
+				this.userEmail = currentUser.getBasicProfile().getEmail() 
 				let isAuthorized = currentUser.hasGrantedScopes(SCOPES);
 				if (isAuthorized) this.setupdown(true)
 				else this.setupdown(false)
+				
 				//re-uses Google auth to manually log the user into Firebase
 				let unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
 					unsubscribe();
@@ -281,6 +291,14 @@ window.onload = function () {
 			resetValidation() {
 				this.$refs.form.resetValidation()
 			},
+
+			lockUnlock(){
+				this.locked ? this.locked = false : this.locked = true 
+			},
+
+			subUnsub(verdict){
+				return
+			}
 		},
 		watch: {
 			pickerDate(val) {
