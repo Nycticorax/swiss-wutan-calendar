@@ -355,8 +355,8 @@ window.onload = function () {
 						messaging.getToken().then((currentToken) => {
 							if (currentToken) {
 								//db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({ 'push_token': currentToken })
-								
-								setTimeout(() => { this.sendPush(currentToken); }, 3000)
+								alert('Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')
+								setTimeout(() => { this.sendPush(currentToken); }, 6000)
 								
 								//return this.sendPush(currentToken)
 								//updateUIForPushEnabled(currentToken);
