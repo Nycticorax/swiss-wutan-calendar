@@ -364,22 +364,16 @@ window.onload = function () {
 						// subsequent calls to getToken will return from cache.
 						messaging.getToken().then((currentToken) => {
 							if (currentToken) {
-								//db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({ 'push_token': currentToken })
-								alert('Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')
-								setTimeout(() => { this.sendPush(currentToken); }, 6000)
-								
+								alert('A notification will be issued in 6 seconds. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')
+								setTimeout(() => { this.sendPush(currentToken); }, 6000)								
 								//return this.sendPush(currentToken)
-								//updateUIForPushEnabled(currentToken);
 							} else {
 								console.log('No Instance ID token available. Request permission to generate one.');
-								//updateUIForPushPermissionRequired();
-								//setTokenSentToServer(false);*/
 								console.log('Got this token', currentToken)
 							}
 						}).catch((err) => {
 							console.log('An error occurred while retrieving token. ', err);
 							console.error('Error retrieving Instance ID token. ', err);
-							//setTokenSentToServer(false);
 						});
 
 					} else {
