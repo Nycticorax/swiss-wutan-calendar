@@ -370,8 +370,8 @@ window.onload = function () {
 						// subsequent calls to getToken will return from cache.
 						messaging.getToken().then((currentToken) => {
 							if (currentToken) {
-								setTimeout(() => { this.sendPush(currentToken); }, 4000)
-								alert('A notification will be issued in 6 seconds. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')						
+								setTimeout(() => { this.sendPush(currentToken); }, 2000)
+								alert('A notification will be issued after you close this window. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')						
 								//return this.sendPush(currentToken)
 							} else {
 								console.log('No Instance ID token available. Request permission to generate one.');
