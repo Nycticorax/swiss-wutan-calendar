@@ -155,10 +155,6 @@ window.onload = function () {
 				})
 			},
 
-			updateSigninStatus(isSignedIn) {
-				this.setSigninStatus()
-			},
-
 			setSigninStatus(isSignedIn) {
 				let vm = this;
 				let googleAuth = vm.api.auth2.getAuthInstance()
@@ -194,6 +190,29 @@ window.onload = function () {
 
 			},
 
+			initMessaging() {
+				messaging.usePublicVapidKey("BJV_rKOrznrxId6JaxqYzlt7HcHjCK-c5S4062SL-dCqDtDkFs5fxifKdAtSyy3OIovPzhRC_O33reZbzBa1O6E");
+				messaging.onTokenRefresh(() => {
+					messaging.getToken().then((refreshedToken) => {
+						console.log('Token refreshed.');
+						db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({ 'push_token': refreshedToken })
+					}).catch((err) => {
+						console.log('Unable to retrieve refreshed token ', err);
+						showToken('Unable to retrieve refreshed token ', err);
+					});
+				});
+
+				messaging.onMessage((payload) => {
+					this.newNotif = payload['notification']['title'] + '\n' + payload['notification']['body']
+					this.snackbar = true
+				});
+
+			},
+			
+			updateSigninStatus(isSignedIn) {
+				this.setSigninStatus()
+			},
+
 			setupdown(verdict) {
 				if (verdict) {
 					this.pullSubmittedEvents().then(() => {
@@ -224,24 +243,6 @@ window.onload = function () {
 					});
 			},
 
-			initMessaging() {
-				messaging.usePublicVapidKey("BJV_rKOrznrxId6JaxqYzlt7HcHjCK-c5S4062SL-dCqDtDkFs5fxifKdAtSyy3OIovPzhRC_O33reZbzBa1O6E");
-				messaging.onTokenRefresh(() => {
-					messaging.getToken().then((refreshedToken) => {
-						console.log('Token refreshed.');
-						db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({ 'push_token': refreshedToken })
-					}).catch((err) => {
-						console.log('Unable to retrieve refreshed token ', err);
-						showToken('Unable to retrieve refreshed token ', err);
-					});
-				});
-
-				messaging.onMessage((payload) => {
-					this.newNotif = payload['notification']['title'] + '\n' + payload['notification']['body']
-					this.snackbar = true
-				});
-
-			},
 
 			// Pull submitted events from firestore
 			pullSubmittedEvents() {
@@ -354,7 +355,10 @@ window.onload = function () {
 						messaging.getToken().then((currentToken) => {
 							if (currentToken) {
 								//db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({ 'push_token': currentToken })
-								return this.sendPush(currentToken)
+								
+								setTimeout(() => { this.sendPush(currentToken); }, 3000)
+								
+								//return this.sendPush(currentToken)
 								//updateUIForPushEnabled(currentToken);
 							} else {
 								console.log('No Instance ID token available. Request permission to generate one.');
