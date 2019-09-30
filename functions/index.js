@@ -101,3 +101,46 @@ exports.updateUserDetails = functions.https.onCall((data, context) => {
     return admin.firestore().collection('swiss-wutan-subscribed').doc(data.gUserEmail)
     .update({ 'notifs_prefs':data.notifs_prefs, 'email': data.email, 'topics': data.topics })
 })
+
+exports.addCalendarEvent = functions.https.onCall((data, context) => {
+	const gCalFields = ['status', 'updated', 'htmlLink', 'summary', 'description', 'location', 'start', 'end', 'organizer', 'creator', 'source', 'reminders']
+	const sanitize = (event) => {
+		for (let k in event) {
+			if (!gCalFields.includes(k)) delete event[k]
+		}
+	return event
+	}
+
+	return Promise.all(data.events.map(e => {
+			// FIX ME: check path to calendar object
+			let r = api.client.calendar.events.insert({
+				'calendarId': CALENDAR_ID,
+				'resource': sanitize(e)
+			})
+			return r.execute()
+	}))
+})
+
+exports.getCalendarEvents = functions.https.onCall((data, context) => {
+    // FIX ME: check path to calendar object
+	return api.client.calendar.events.list({
+		'calendarId': CALENDAR_ID,
+		'timeMin': (new Date()).toISOString(),
+		'showDeleted': false,
+		'singleEvents': true,
+		'maxResults': 10,
+		'orderBy': 'startTime'
+	}).then(response => {
+		return response.result.items.map(e => {
+			return {
+				'local_id': Math.floor(Math.random() * Math.floor(1000)).toString(),
+				'validation_status': 'accepted',
+				'summary': e.summary,
+				'description': e.description,
+				'location': e.location,
+				'start': { 'dateTime': e.start.dateTime },
+				'end': { 'dateTime:': e.end.dateTime }
+			}
+		})
+	})
+})
