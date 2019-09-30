@@ -6,7 +6,6 @@ babel.config.js
 package-lock.json
 package.json
 test.js
-functions
 firebase.json
 
 # local env files
