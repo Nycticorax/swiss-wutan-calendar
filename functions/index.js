@@ -68,4 +68,36 @@ exports.notifySubscribed = functions.firestore.document('swiss-wutan-events/{eve
         }).catch(err => console.error('Found error in notifySubscribed', err))
     } else return Promise.reject()
 
-});
+})
+
+exports.getOrCreateUser = functions.https.onCall((data, context) => {
+    let userRef = admin.firestore().collection('swiss-wutan-subscribed').doc(data.gUserEmail)
+    return admin.firestore().collection('swiss-wutan-subscribed').doc(data.gUserEmail)
+    .get()
+    .then(doc => {
+        if (doc.exists) return doc.data()
+            else return userRef.set({ 'email': data.gUserEmail, 'created_on': admin.firestore.ServerValue.TIMESTAMP})
+        })
+})
+
+exports.updateUserToken = functions.https.onCall((data, context) => {
+    return admin.firestore().collection('swiss-wutan-subscribed').doc(data.gUserEmail)
+    .update({ 'push_token': data.token })
+
+})
+exports.getSubmittedEvents = functions.https.onCall((data, context) => {
+    return admin.firestore().collection('swiss-wutan-events').where("validation_status", "==", "submitted")
+    .get()
+    .then(snap => data.submittedEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+    .catch(err => console.log(JSON.stringify(err)))
+})
+
+exports.acceptSubmittedEvents = functions.https.onCall((data, context) => {
+    return Promise.all(data.events_ids.map(id => admin.firestore().collection('swiss-wutan-events').doc(id)
+        .update({ 'validation_status': 'accepted' })))
+})
+
+exports.updateUserDetails = functions.https.onCall((data, context) => {
+    return admin.firestore().collection('swiss-wutan-subscribed').doc(data.gUserEmail)
+    .update({ 'notifs_prefs':data.notifs_prefs, 'email': data.email, 'topics': data.topics })
+})
