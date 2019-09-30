@@ -294,22 +294,24 @@
 										</v-col>
 										<!-- MORE CHECKBOXES -->
 										<v-col cols="12" md="6">
+											<v-combobox v-model="topics" multiple chips :items="topics_opts" label="Topics"
+											deletable-chips></v-combobox>
+										</v-col>
+										<v-col cols="12" md="6">
 											<v-checkbox v-model="event.privacy" color="red darken-2"
 												label="This event is meant only for Swiss Wutan members">
 											</v-checkbox>
 											<v-checkbox v-model="event.registration" color="red darken-2"
 												label="Registration required">
 											</v-checkbox>
-										</v-col>
-										<v-col cols="12" md="6">
+											<div id="register" v-if=event.registration>
+													<v-combobox v-model="event.registration_details" :items="fillFromOpts"
+														filled label="Participants register here (url, email):....">
+													</v-combobox>
+											</div>
 											<v-checkbox v-model="event.discount" color="red darken-2"
 												label="Swiss Wutan members get a special discount">
 											</v-checkbox>
-											<div id="register" v-if=event.registration>
-												<v-combobox v-model="event.registration_details" :items="fillFromOpts"
-													filled label="Participants register here (url, email):....">
-												</v-combobox>
-											</div>
 										</v-col>
 
 										<!-- COMMENTS -->
