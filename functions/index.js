@@ -42,9 +42,9 @@ function sendEmail(addressees_emails, summary) {
     const mailOptions = {
         from: 'Adrien Glauser <mrnyticorax@gmail@gmail.com>', // sender address
         to: addressees_emails, // list of receivers
-        subject: "New event: " + summary, // Subject line
+        subject: "New Swiss Wutan Event: " + summary, // Subject line
         text: 'Told you it worked. But you still had to try it out for yourself.',
-        html: '<p>But you still had to try it out for yourself.</p>'// plain text body
+        html: '<p>Told you it worked. But you still had to try it out for yourself.</p>'// plain text body
     }
     const mailTransport = nodemailer.createTransport({
         host: 'smtp.gmail.com',
@@ -59,6 +59,7 @@ function sendEmail(addressees_emails, summary) {
 }
 
 exports.notifySubscribed = functions.firestore.document('swiss-wutan-events/{event}').onUpdate((change, context) => {
+    // upon an event updated to 'accepted', sends emails and / or web push notifications to all whose topics intersect topics of the event
     const newData = change.after.data();
     const oldData = change.before.data();
     if (newData.validation_status === 'accepted' && oldData.validation_status === 'submitted') {
