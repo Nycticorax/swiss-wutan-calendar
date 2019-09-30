@@ -158,11 +158,11 @@
 						</div>
 						<!-- ACCEPT / REJECT -->
 						<v-card-actions>
-							<v-btn v-if="authorized && selectedEvents.length > 0" @click="validateEvents()">
+							<v-btn v-if="authorized && active_tab == 0 && selectedEvents.length > 0" @click="acceptSubmitted()">
 								Accept submitted event(s)</v-btn>
 							<v-btn v-else-if="authorized" disabled>Accept submitted
 								event(s)</v-btn>
-							<v-btn v-if="authorized && selectedEvents.length > 0" @click="rejecting = !rejecting">Reject
+							<v-btn v-if="authorized && active_tab == 0 && selectedEvents.length > 0" @click="rejecting = !rejecting">Reject
 								submitted event(s)</v-btn>
 							<v-btn v-else-if='authorized' disabled>Reject submitted
 								event(s)</v-btn>
@@ -210,7 +210,7 @@
 						<v-card class="d-flex pa-2" outlined tile>
 							<div :key="iframe_key">
 								<iframe
-									src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=0&amp;showDate=1&amp;showPrint=0&amp;showCalendars=0&amp;showTz=0&amp;mode=MONTH&amp;hl=en_GB"
+									src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=0&amp;showDate=1&amp;showPrint=0&amp;showCalendars=0&amp;showTz=0&amp;mode=AGENDA&amp;hl=en_GB"
 									style="border-width:0" width="900" height="600" frameborder="0"
 									scrolling="no"></iframe>
 							</div>
@@ -312,7 +312,7 @@
 												outlined shaped v-model="event.comments"></v-textarea>
 										</v-container>
 										<!-- SUBMIT -->
-										<v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">
+										<v-btn :disabled="!valid" color="success" class="mr-4" @click="submitEvent()">
 											Validate
 										</v-btn>
 										<v-btn color="error" class="mr-4" @click="reset">

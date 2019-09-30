@@ -5,7 +5,7 @@ src
 babel.config.js
 package-lock.json
 package.json
-
+test.js
 
 # local env files
 .env.local

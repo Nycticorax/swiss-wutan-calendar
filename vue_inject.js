@@ -56,7 +56,7 @@ window.onload = function () {
 					{ text: 'Start', value: 'start.dateTime', sortable: 'true' },
 					{ text: 'End', value: 'end.dateTime' },
 				],
-				selectedEvents: [],
+				selectedEvents:[],
 				active_tab: 1,
 				rejecting: false,
 				rejecting_why: '',
@@ -259,36 +259,14 @@ window.onload = function () {
 					});
 			},
 
-
 			// Pull submitted events from firestore
 			pullSubmittedEvents() {
-				return db.collection('swiss-wutan-submitted-events').get()
+				return db.collection('swiss-wutan-events').where("validation_status", "==", "submitted").get()
 					.then(snap => this.submittedEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
 					.catch(err => console.log(JSON.stringify(err)))
 			},
 
-			pushSubmittedEvents(accepted) {
-				return db.collection('...')
-			},
-
-			// Accept or reject events
-			validateEvents() {
-				let vm = this
-
-				this.submittedEvents.forEach(e => {
-					let r = vm.api.client.calendar.events.insert({
-						'calendarId': CALENDAR_ID,
-						'resource': e
-					})
-					r.execute((e) => {
-						this.pullScheduled()
-						this.submittedEvents = []
-						this.active_tab = 1
-					});
-				});
-			},
-
-			// Fetch events from Calendar API
+			// Pull events from Calendar API
 			pullScheduled() {
 				let vm = this;
 
@@ -302,7 +280,8 @@ window.onload = function () {
 				}).then(response => {
 					this.events = response.result.items.map(e => {
 						return {
-							'id': Math.floor(Math.random() * Math.floor(1000)).toString(),
+							'local_id': Math.floor(Math.random() * Math.floor(1000)).toString(),
+							'validation_status': 'accepted',
 							'summary': e.summary,
 							'description': e.description,
 							'location': e.location,
@@ -314,6 +293,34 @@ window.onload = function () {
 
 			},
 
+			// Accept or reject events
+			acceptSubmitted() {
+				const vm = this
+				const gCalFields = ['status','updated','htmlLink','summary','description','location','start','end','organizer','creator','source','reminders']
+				const sanitize = (event) => {
+					for (let k in event){
+						if (!gCalFields.includes(k)) delete event[k]
+					}
+					return event
+				}
+				const events = this.selectedEvents.filter(e => e['validation_status'] === 'submitted')
+
+				Promise.all(events.map(e => db.collection('swiss-wutan-events').doc(e.id).update({'validation_status':'accepted'})))
+				.then(() => {					
+					events.forEach(e => {
+						let r = vm.api.client.calendar.events.insert({
+							'calendarId': CALENDAR_ID,
+							'resource': sanitize(e)
+						})
+						r.execute(() => {
+							this.setupdown(this.authorized)
+						})
+					})
+				})
+
+			},
+
+
 			sendRejection() {
 				console.log('rejected')
 			},
@@ -323,8 +330,10 @@ window.onload = function () {
 				this.iframe_key += 1;
 			},
 
-			// Form validation & reset
-			validate() {
+			// FIX ME : TALK TO DATABASE
+			submitEvent() {
+				alert('Not implemented yet.')
+				/*
 				if (this.$refs.form.validate()) {
 					this.snackbar = true
 					this.submittedEvents.push({
@@ -340,7 +349,7 @@ window.onload = function () {
 							'timeZone': 'Europe/Zurich'
 						}
 					})
-				}
+				}*/
 			},
 
 			reset() {
