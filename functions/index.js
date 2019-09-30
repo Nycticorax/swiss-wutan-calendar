@@ -5,18 +5,27 @@ const nodemailer = require('nodemailer')
 admin.initializeApp();
 
 function getConcerned(event_topics) {
-    // returns users whose topics intersect event_topics
+    // returns emails & tokens of those whose topics intersect event_topics
     return admin.firestore().collection('swiss-wutan-subscribed').get()
-        .then(snap => snap.docs
-            .filter(doc => doc.data().topics && doc.data().topics
-                .some(t => event_topics.includes(t) && doc.data().notifs_prefs.length > 0)))
+    .then(snap => {
+        let concerned = snap.docs.filter(doc => {
+            let notifs_prefs = doc.data().notifs_prefs || null 
+            let topics = doc.data().topics || null
+            if (notifs_prefs && topics && topics.length>0 && notifs_prefs.length > 0 && event_topics.some(et => topics.includes(et))){
+                return true
+            }
+        })
+        let emails = concerned.filter(doc => doc.data().notifs_prefs.includes('Email') && doc.data().email).map(doc => doc.data().email)
+        let tokens = concerned.filter(doc => doc.data().notifs_prefs.includes('Web push') && doc.data().push_token).map(doc => doc.data().push_token)
+        return {emails:emails, tokens:tokens}
+    })
 }
 
 function sendPush(addressee_token, summary) {
     const pushPayload = {
         webpush: {
             notification: {
-                title: 'New event ',
+                title: 'New event matching your topics on swiss-wutan-beta-calendar',
                 body: summary.slice(0, 30),
                 icon: 'https://static.thenounproject.com/png/78842-200.png',
             }
@@ -28,6 +37,7 @@ function sendPush(addressee_token, summary) {
 }
 
 function sendEmail(addressees_emails, summary) {
+    console.log(addressees_emails)
     const gmailEmail = functions.config().gmail.email
     const gmailPassword = functions.config().gmail.password
     const mailOptions = {
@@ -53,14 +63,8 @@ exports.notifySubscribed = functions.firestore.document('swiss-wutan-events/{eve
     const newData = change.after.data();
     const oldData = change.before.data();
     if (newData.validation_status === 'accepted' && oldData.validation_status === 'submitted') {
-        getConcerned(newData.topics).then(usersDocs => {
-            let emails = usersDocs.map(userDoc => {
-                if (userDoc.data().notifs_prefs.includes('Email')) return userDoc.data().email
-            })
-            let push_tokens = usersDocs.map(userDoc => {
-                if (userDoc.data().notifs_prefs.includes('Web push') && userDoc.data().push_token) return userDoc.data().push_token
-            })
-            return Promise.all([sendEmail(emails, newData.summary), push_tokens.map(token => sendPush(token, newData.summary))])
+        getConcerned(newData.topics).then(res => {
+            return Promise.all([sendEmail(res.emails, newData.summary), ...res.tokens.map(token => sendPush(token, newData.summary))])
         }).catch(err => console.error('Found error in notifySubscribed', err))
     } else return Promise.reject()
 

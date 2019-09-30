@@ -360,13 +360,13 @@
 										</v-text-field>
 									</v-col>
 									<v-col cols="12" md="4">
-										<v-combobox v-model="notif_prefs" :items="notifs_opts" multiple chips
+										<v-combobox v-model="notifs_prefs" :items="notifs_opts" multiple chips
 											deletable-chips label="Notifications"></v-combobox>
 									</v-col>
 									<v-col cols="12" md="4">
 										<v-combobox v-model="topics" multiple chips :items="topics_opts" label="Topics"
 											deletable-chips></v-combobox>
-										<v-btn class="ma-2" outlined text color="primary" disabled>Test email</v-btn>
+										<v-btn class="ma-2" outlined text color="primary" @click="testEmail">Test email</v-btn>
 										<v-btn class="ma-2" outlined text color="primary" @click="testPush">Test web
 											push</v-btn>
 									</v-col>
@@ -374,8 +374,8 @@
 								<v-btn v-if="emailNotif !== gUserEmail" color="success" @click="subUnsub(true)">
 									Subscribe</v-btn>
 								<v-btn v-else disabled color="success" @click="subUnsub(true)">Subscribe</v-btn>
-								<v-btn v-if="emailNotif === gUserEmail" color="error" @click="subUnsub(false)">
-									Unsubscribe</v-btn>
+								<v-btn v-if="emailNotif === gUserEmail" color="warning" @click="subUnsub(false)">
+									Edit subscription</v-btn>
 								<v-btn v-else disabled color="error" @click="subUnsub(false)">Unsubscribe</v-btn>
 							</v-container>
 						</v-form>

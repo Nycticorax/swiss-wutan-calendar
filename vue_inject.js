@@ -113,7 +113,7 @@ window.onload = function () {
 				topics_opts: ['Wutan Official', 'CH Seminars', 'TW Seminars'],
 				topics: ['Wutan Official', 'CH Seminars', 'TW Seminars'],
 				locked: false,
-				notif_prefs: ['Email', 'Web push'],
+				notifs_prefs: ['Email', 'Web push'],
 				notifs_opts: ['Email', 'Web push'],
 				snackbar: false,
 				newNotif: '',
@@ -199,7 +199,7 @@ window.onload = function () {
 						.then(() => userRef.get())
 						.then(doc => {
 							if (!doc.exists) userRef.set({ 'email': this.gUserEmail, 'created_on': firebase.firestore.FieldValue.serverTimestamp() })
-							else if (doc.data().notif_prefs) this.notif_prefs = doc.data().notif_prefs
+							else if (doc.data().notifs_prefs) this.notifs_prefs = doc.data().notifs_prefs
 						})
 					//}
 				})
@@ -367,10 +367,14 @@ window.onload = function () {
 			subUnsub(verdict) {
 				let email = verdict ? this.emailNotif : this.gUserEmail
 				db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({
-					'notif_prefs': this.notif_prefs,
+					'notifs_prefs': this.notifs_prefs,
 					'email': email,
 					'topics': this.topics
 				})
+			},
+
+			testEmail() {
+				alert('To test this feature, make sure you have registered to Wutan Official and are accepting notifications via emails.')
 			},
 
 			testPush() {
@@ -379,6 +383,7 @@ window.onload = function () {
 						// subsequent calls to getToken will return from cache.
 						messaging.getToken().then((currentToken) => {
 							if (currentToken) {
+								db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({'push_token':currentToken})
 								setTimeout(() => { this.sendPush(currentToken); }, 2000)
 								alert('A notification will be issued after you close this window. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')
 								//return this.sendPush(currentToken)
