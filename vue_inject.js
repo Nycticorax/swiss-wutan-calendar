@@ -172,8 +172,8 @@ window.onload = function () {
 				this.emailNotif = this.gUserEmail
 
 				let isAuthorized = currentUser.hasGrantedScopes(SCOPES);
-				if (isAuthorized) this.setupdown(true)
-				else this.setupdown(false)
+				if (isAuthorized) this.updateUI(true)
+				else this.updateUI(false)
 
 				// re-uses Google auth to manually log the user into Firebase
 				let unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
@@ -229,7 +229,7 @@ window.onload = function () {
 				this.setSigninStatus()
 			},
 
-			setupdown(verdict) {
+			updateUI(verdict) {
 				if (verdict) {
 					this.pullSubmittedEvents().then(() => {
 						this.authorized = true;
@@ -247,7 +247,7 @@ window.onload = function () {
 			handleAuthClick(event) {
 				Promise.resolve(this.api.auth2.getAuthInstance().signIn())
 					.then(_ => {
-						this.setupdown(true)
+						this.updateUI(true)
 					});
 			},
 
@@ -255,7 +255,7 @@ window.onload = function () {
 			handleSignoutClick(event) {
 				Promise.resolve(this.api.auth2.getAuthInstance().signOut())
 					.then(_ => {
-						this.setupdown(false)
+						this.updateUI(false)
 					});
 			},
 
@@ -313,7 +313,7 @@ window.onload = function () {
 							'resource': sanitize(e)
 						})
 						r.execute(() => {
-							this.setupdown(this.authorized)
+							this.updateUI(this.authorized)
 						})
 					})
 				})
