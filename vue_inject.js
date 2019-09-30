@@ -39,22 +39,22 @@ window.onload = function () {
 				authorized: false,
 				navItems: [{ title: 'Introduction', target: '#intro' }, { title: 'Authentication', target: '#auth' }, { title: 'Manage events', target: '#manage' }, { title: 'Google Calendar', target: '#gCal' }, { title: 'Submit new events', target: '#submit' }, { title: 'Subscribe to new events', target: '#subscribe' }],
 				nav: true,
-				events: [],
 				submittedEvents: [],
-				events_headers: [
-					{ text: 'Title', value: 'summary', sortable: 'true' },
-					{ text: 'Submitted by', value: 'author', sortable: 'true' },
-					{ text: 'Category', value: 'category', sortable: 'true' },
-					{ text: 'Start', value: 'start.dateTime', sortable: 'true' },
-					{ text: 'End', value: 'end.dateTime' },
-				],
+				events: [],
 				search: '',
 				submittedEvents_headers: [
 					{ text: 'Title', value: 'summary', sortable: 'true' },
 					{ text: 'Submitted By', value: 'submitted_by', sortable: 'true' },
-					{ text: 'Category', value: 'category', sortable: 'true' },
+					{ text: 'Topics', value: 'topics', sortable: 'true' },
 					{ text: 'Start', value: 'start.dateTime', sortable: 'true' },
 					{ text: 'End', value: 'end.dateTime' },
+					{ text: 'Location', value: 'location', sortable: 'true'}
+				],
+				events_headers: [
+					{ text: 'Title', value: 'summary', sortable: 'true' },
+					{ text: 'Start', value: 'start.dateTime', sortable: 'true' },
+					{ text: 'End', value: 'end.dateTime' },
+					{ text: 'Location', value: 'location', sortable: 'true'}
 				],
 				selectedEvents:[],
 				active_tab: 1,
