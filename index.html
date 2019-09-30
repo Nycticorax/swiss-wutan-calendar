@@ -342,7 +342,7 @@
 							<v-toolbar-title>Subscribe</v-toolbar-title>
 						</v-toolbar>
 						<!-- <v-card-title></v-card-title> -->
-						<v-card-text>Here users can manage their subscriptions to 'topics', namely theme-related events
+						<v-card-text>You need to be logged in to use this feature. Here users can manage their subscriptions to 'topics', namely theme-related events
 							about which they want to be notified. Notifications can be sent as emails or web push. Play
 							around to see them in action.</v-card-text>
 						<v-divider></v-divider>
@@ -371,12 +371,12 @@
 											push</v-btn>
 									</v-col>
 								</v-row>
-								<v-btn v-if="emailNotif !== gUserEmail" color="success" @click="subUnsub(true)">
+								<v-btn v-if="authorized && emailNotif !== gUserEmail" color="success" @click="subUnsub(true)">
 									Subscribe</v-btn>
-								<v-btn v-else disabled color="success" @click="subUnsub(true)">Subscribe</v-btn>
-								<v-btn v-if="emailNotif === gUserEmail" color="warning" @click="subUnsub(false)">
+								<v-btn v-else disabled color="success">Subscribe</v-btn>
+								<v-btn v-if="authorized && emailNotif === gUserEmail" color="warning" @click="subUnsub(false)">
 									Edit subscription</v-btn>
-								<v-btn v-else disabled color="error" @click="subUnsub(false)">Unsubscribe</v-btn>
+								<v-btn v-else disabled color="error">Unsubscribe</v-btn>
 							</v-container>
 						</v-form>
 					</v-card>
