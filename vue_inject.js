@@ -374,7 +374,7 @@ window.onload = function () {
 			},
 
 			testEmail() {
-				alert('To test this feature, make sure you have registered to Wutan Official and are accepting notifications via emails.')
+				alert('To test this feature, make sure you have registered to Wutan Official and are accepting notifications via emails. Then select the submitted event above, and click the ACCEPT SUBMITTED EVENT button.')
 			},
 
 			testPush() {

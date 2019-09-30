@@ -37,7 +37,6 @@ function sendPush(addressee_token, summary) {
 }
 
 function sendEmail(addressees_emails, summary) {
-    console.log(addressees_emails)
     const gmailEmail = functions.config().gmail.email
     const gmailPassword = functions.config().gmail.password
     const mailOptions = {
@@ -63,7 +62,7 @@ exports.notifySubscribed = functions.firestore.document('swiss-wutan-events/{eve
     const newData = change.after.data();
     const oldData = change.before.data();
     if (newData.validation_status === 'accepted' && oldData.validation_status === 'submitted') {
-        getConcerned(newData.topics).then(res => {
+        return getConcerned(newData.topics).then(res => {
             return Promise.all([sendEmail(res.emails, newData.summary), ...res.tokens.map(token => sendPush(token, newData.summary))])
         }).catch(err => console.error('Found error in notifySubscribed', err))
     } else return Promise.reject()
