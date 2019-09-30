@@ -48,15 +48,15 @@ window.onload = function () {
 					{ text: 'Topics', value: 'topics', sortable: 'true' },
 					{ text: 'Start', value: 'start.dateTime', sortable: 'true' },
 					{ text: 'End', value: 'end.dateTime' },
-					{ text: 'Location', value: 'location', sortable: 'true'}
+					{ text: 'Location', value: 'location', sortable: 'true' }
 				],
 				events_headers: [
 					{ text: 'Title', value: 'summary', sortable: 'true' },
 					{ text: 'Start', value: 'start.dateTime', sortable: 'true' },
 					{ text: 'End', value: 'end.dateTime' },
-					{ text: 'Location', value: 'location', sortable: 'true'}
+					{ text: 'Location', value: 'location', sortable: 'true' }
 				],
-				selectedEvents:[],
+				selectedEvents: [],
 				active_tab: 1,
 				rejecting: false,
 				rejecting_why: '',
@@ -126,8 +126,8 @@ window.onload = function () {
 			this.initMessaging()
 		},
 
-		mounted(){
-			console.log('Loaded in (sec)',performance.now()-t0)
+		mounted() {
+			console.log('Loaded in (sec)', performance.now() - t0)
 		},
 
 		computed: {
@@ -178,16 +178,16 @@ window.onload = function () {
 				// re-uses Google auth to manually log the user into Firebase
 				let unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
 					unsubscribe();
-					
+
 					if (firebaseUser) {
 						let providerData = firebaseUser.providerData;
 						for (let i = 0; i < providerData.length; i++) {
-						  if (providerData[i].providerId === firebase.auth.GoogleAuthProvider.PROVIDER_ID &&
-							  providerData[i].uid === currentUser.getBasicProfile().getId()) {
-								  return true;
-						  }
+							if (providerData[i].providerId === firebase.auth.GoogleAuthProvider.PROVIDER_ID &&
+								providerData[i].uid === currentUser.getBasicProfile().getId()) {
+								return true;
+							}
 						}
-					  }
+					}
 
 					let token = currentUser.getAuthResponse().id_token
 					let credential = firebase.auth.GoogleAuthProvider.credential(token)
@@ -224,7 +224,7 @@ window.onload = function () {
 				});
 
 			},
-			
+
 			updateSigninStatus(isSignedIn) {
 				this.setSigninStatus()
 			},
@@ -296,27 +296,27 @@ window.onload = function () {
 			// Accept or reject events
 			acceptSubmitted() {
 				const vm = this
-				const gCalFields = ['status','updated','htmlLink','summary','description','location','start','end','organizer','creator','source','reminders']
+				const gCalFields = ['status', 'updated', 'htmlLink', 'summary', 'description', 'location', 'start', 'end', 'organizer', 'creator', 'source', 'reminders']
 				const sanitize = (event) => {
-					for (let k in event){
+					for (let k in event) {
 						if (!gCalFields.includes(k)) delete event[k]
 					}
 					return event
 				}
 				const events = this.selectedEvents.filter(e => e['validation_status'] === 'submitted')
 
-				Promise.all(events.map(e => db.collection('swiss-wutan-events').doc(e.id).update({'validation_status':'accepted'})))
-				.then(() => {					
-					events.forEach(e => {
-						let r = vm.api.client.calendar.events.insert({
-							'calendarId': CALENDAR_ID,
-							'resource': sanitize(e)
-						})
-						r.execute(() => {
-							this.updateUI(this.authorized)
+				Promise.all(events.map(e => db.collection('swiss-wutan-events').doc(e.id).update({ 'validation_status': 'accepted' })))
+					.then(() => {
+						events.forEach(e => {
+							let r = vm.api.client.calendar.events.insert({
+								'calendarId': CALENDAR_ID,
+								'resource': sanitize(e)
+							})
+							r.execute(() => {
+								this.updateUI(this.authorized)
+							})
 						})
 					})
-				})
 
 			},
 
@@ -380,7 +380,7 @@ window.onload = function () {
 						messaging.getToken().then((currentToken) => {
 							if (currentToken) {
 								setTimeout(() => { this.sendPush(currentToken); }, 2000)
-								alert('A notification will be issued after you close this window. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')						
+								alert('A notification will be issued after you close this window. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')
 								//return this.sendPush(currentToken)
 							} else {
 								console.log('No Instance ID token available. Request permission to generate one.');
@@ -397,7 +397,7 @@ window.onload = function () {
 				})
 			},
 
-			sendPush(token){
+			sendPush(token) {
 				let key = 'AAAAnwC-2to:APA91bG4Ehb9g8Gt7vjMyqO5-S5EL8XD0ZpJaEWXpHF6wm2AusPieTcSjfvO_ya6izP7cU5L0CWV1xs3eeS-rhg0TERFowF_0QZtyYLSzMfvdyM6NRQG9ncR-oUXHg_IpO1YuNttWtYN';
 				let notification = {
 					'title': 'You have the KUNG-FU!',
@@ -412,15 +412,15 @@ window.onload = function () {
 						'Content-Type': 'application/json'
 					},
 					'body': JSON.stringify({
-					'notification': notification,
-					'to': token
+						'notification': notification,
+						'to': token
 					})
-				}).then(function(response) {
+				}).then(function (response) {
 					console.log(response);
-				}).catch(function(error) {
+				}).catch(function (error) {
 					console.error(error);
 				})
-			
+
 			},
 
 

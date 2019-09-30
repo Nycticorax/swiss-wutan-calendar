@@ -80,7 +80,8 @@
 								<v-btn v-if='!authorized' @click="handleAuthClick">Log in</v-btn>
 								<v-btn v-if='authorized' @click="handleSignoutClick">Log out</v-btn>
 							</v-card-actions>
-							<v-card-text>Acquire admin credentials here. Please note that you will need a Google Account to make the most of this demo. Email + password login will be available.</v-card-text>
+							<v-card-text>Acquire admin credentials here. Please note that you will need a Google Account
+								to make the most of this demo. Email + password login will be available.</v-card-text>
 						</v-card>
 					</v-card>
 				</v-container>
@@ -158,11 +159,13 @@
 						</div>
 						<!-- ACCEPT / REJECT -->
 						<v-card-actions>
-							<v-btn v-if="authorized && active_tab == 0 && selectedEvents.length > 0" @click="acceptSubmitted()">
+							<v-btn v-if="authorized && active_tab == 0 && selectedEvents.length > 0"
+								@click="acceptSubmitted()">
 								Accept submitted event(s)</v-btn>
 							<v-btn v-else-if="authorized" disabled>Accept submitted
 								event(s)</v-btn>
-							<v-btn v-if="authorized && active_tab == 0 && selectedEvents.length > 0" @click="rejecting = !rejecting">Reject
+							<v-btn v-if="authorized && active_tab == 0 && selectedEvents.length > 0"
+								@click="rejecting = !rejecting">Reject
 								submitted event(s)</v-btn>
 							<v-btn v-else-if='authorized' disabled>Reject submitted
 								event(s)</v-btn>
@@ -190,7 +193,10 @@
 							<v-toolbar-title>Check the results</v-toolbar-title>
 						</v-toolbar>
 						<v-card-text>
-							<p>This is NOT the actual calendar used to review and submit events (see below for the real calendar). This is just the "official" interface Google provides for interacting with events. I am putting it here simply to show that accepting submitted events works. By the way it is visible by
+							<p>This is NOT the actual calendar used to review and submit events (see below for the real
+								calendar). This is just the "official" interface Google provides for interacting with
+								events. I am putting it here simply to show that accepting submitted events works. By
+								the way it is visible by
 								anyone on
 								the internet -- no credentials required. Here's its <a
 									href="https://calendar.google.com/calendar/embed?src=3mo0a639qfhs9tjc1idmu4kkus%40group.calendar.google.com&ctz=Europe%2FZurich">home
@@ -209,7 +215,10 @@
 						</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<div :key="iframe_key">
-								<iframe src="https://calendar.google.com/calendar/embed?height=450&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=1&amp;showNav=1&amp;showPrint=0&amp;showTabs=0&amp;showCalendars=0&amp;showTz=0&amp;mode=AGENDA&amp;hl=de" style="border-width:0" width="450" height="450" frameborder="0" scrolling="no"></iframe>
+								<iframe
+									src="https://calendar.google.com/calendar/embed?height=450&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=1&amp;showNav=1&amp;showPrint=0&amp;showTabs=0&amp;showCalendars=0&amp;showTz=0&amp;mode=AGENDA&amp;hl=de"
+									style="border-width:0" width="450" height="450" frameborder="0"
+									scrolling="no"></iframe>
 							</div>
 						</v-card>
 					</v-card>
@@ -331,7 +340,9 @@
 							<v-toolbar-title>Subscribe</v-toolbar-title>
 						</v-toolbar>
 						<!-- <v-card-title></v-card-title> -->
-						<v-card-text>Here users can manage their subscriptions to 'topics', namely theme-related events about which they want to be notified. Notifications can be sent as emails or web push. Play around to see them in action.</v-card-text>
+						<v-card-text>Here users can manage their subscriptions to 'topics', namely theme-related events
+							about which they want to be notified. Notifications can be sent as emails or web push. Play
+							around to see them in action.</v-card-text>
 						<v-divider></v-divider>
 						<v-form>
 							<v-container>
@@ -351,26 +362,29 @@
 											deletable-chips label="Notifications"></v-combobox>
 									</v-col>
 									<v-col cols="12" md="4">
-										<v-combobox v-model="topics" multiple chips :items="topics_opts"
-										label="Topics" deletable-chips></v-combobox>
+										<v-combobox v-model="topics" multiple chips :items="topics_opts" label="Topics"
+											deletable-chips></v-combobox>
 										<v-btn class="ma-2" outlined text color="primary" disabled>Test email</v-btn>
-										<v-btn class="ma-2" outlined text color="primary" @click="testPush">Test web push</v-btn>
+										<v-btn class="ma-2" outlined text color="primary" @click="testPush">Test web
+											push</v-btn>
 									</v-col>
 								</v-row>
-								<v-btn v-if="emailNotif !== gUserEmail" color="success" @click="subUnsub(true)">Subscribe</v-btn>
+								<v-btn v-if="emailNotif !== gUserEmail" color="success" @click="subUnsub(true)">
+									Subscribe</v-btn>
 								<v-btn v-else disabled color="success" @click="subUnsub(true)">Subscribe</v-btn>
-								<v-btn v-if="emailNotif === gUserEmail" color="error" @click="subUnsub(false)">Unsubscribe</v-btn>
+								<v-btn v-if="emailNotif === gUserEmail" color="error" @click="subUnsub(false)">
+									Unsubscribe</v-btn>
 								<v-btn v-else disabled color="error" @click="subUnsub(false)">Unsubscribe</v-btn>
 							</v-container>
 						</v-form>
 					</v-card>
 				</v-container>
 			</v-content>
-				<v-snackbar v-if="newNotif" v-model="snackbar">{{ newNotif }}
-					<v-btn color="pink" text @click="snackbar = false">
+			<v-snackbar v-if="newNotif" v-model="snackbar">{{ newNotif }}
+				<v-btn color="pink" text @click="snackbar = false">
 					Close
 				</v-btn>
-				</v-snackbar>
+			</v-snackbar>
 		</v-app>
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
