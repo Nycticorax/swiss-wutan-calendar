@@ -190,11 +190,11 @@
 							<v-toolbar-title>Check the results</v-toolbar-title>
 						</v-toolbar>
 						<v-card-text>
-							<p>So that's the WUTAN CALENDAR I was talking about. It's a very simple calendar visible by
+							<p>This is NOT the actual calendar used to review and submit events (see below for the real calendar). This is just the "official" interface Google provides for interacting with events. I am putting it here simply to show that accepting submitted events works. By the way it is visible by
 								anyone on
 								the internet -- no credentials required. Here's its <a
 									href="https://calendar.google.com/calendar/embed?src=3mo0a639qfhs9tjc1idmu4kkus%40group.calendar.google.com&ctz=Europe%2FZurich">home
-									page</a>. Don't be mislead by its simplicity, however. Google Calendars have many
+									page</a>. Also, remember that Google Calendars have many
 								features:</p>
 							<ol>
 								<li>can share links to expose any calendar</li>
@@ -209,10 +209,7 @@
 						</v-card-text>
 						<v-card class="d-flex pa-2" outlined tile>
 							<div :key="iframe_key">
-								<iframe
-									src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=0&amp;showDate=1&amp;showPrint=0&amp;showCalendars=0&amp;showTz=0&amp;mode=AGENDA&amp;hl=en_GB"
-									style="border-width:0" width="900" height="600" frameborder="0"
-									scrolling="no"></iframe>
+								<iframe src="https://calendar.google.com/calendar/embed?height=450&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=1&amp;showNav=1&amp;showPrint=0&amp;showTabs=0&amp;showCalendars=0&amp;showTz=0&amp;mode=AGENDA&amp;hl=de" style="border-width:0" width="450" height="450" frameborder="0" scrolling="no"></iframe>
 							</div>
 						</v-card>
 					</v-card>
@@ -259,8 +256,8 @@
 												:picker-date.sync="pickerDate" full-width></v-date-picker>
 										</v-col>
 										<v-col cols="12" sm="6" class="my-2 px-1">
-											<div class="subheading">Here are events scheduled for the displayed month.
-												Please do get in touch to avoid unfortunate overlaps.
+											<div class="title">Real calendar for all users (not only admins)</div>
+											<div class="subheader">Switch to October to see the scheduled events.
 											</div>
 											<ul class="ma-4">
 												<li v-for="e in thisMonthEvents">{{ e.summary }}{{ e.start.dateTime }}
