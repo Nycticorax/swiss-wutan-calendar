@@ -6,6 +6,8 @@ babel.config.js
 package-lock.json
 package.json
 test.js
+functions
+firebase.json
 
 # local env files
 .env.local
@@ -24,3 +26,4 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+.firebaserc
