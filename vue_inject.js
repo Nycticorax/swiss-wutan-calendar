@@ -1,6 +1,6 @@
 const t0 = performance.now()
 
-/* GOOGLE APIs CLIENT CREDENTIALS */
+// PRIVATE: REMOVE ME -- GOOGLE APIs CLIENT CREDENTIALS
 const CLIENT_ID = '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw';
 // Array of API discovery doc URLs for APIs used by the quickstart
@@ -10,7 +10,7 @@ const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/calendar/v
 const SCOPES = 'https://www.googleapis.com/auth/calendar'//, 'https://www.googleapis.com/auth/cloud-platform'];
 const CALENDAR_ID = '3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com'
 
-/* GOOGLE FIREBASE CLIENT CREDENTIALS */
+// PUBLIC -- GOOGLE FIREBASE CLIENT CREDENTIALS & FUNCTIONS
 const firebaseConfig = {
 	apiKey: "AIzaSyBn9ur32UG9DkmN74HYciXzcp7uoJ2hwuU",
 	authDomain: "main-repo.firebaseapp.com",
@@ -23,7 +23,16 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore()
 
-/* GOOGLE FIREBASE MESSAGING */
+const getOrCreateUser = firebase.functions().httpsCallable('getOrCreateUser');
+const updateUserToken = firebase.functions().httpsCallable('getOrCreateUser');
+const getSubmittedEvents = firebase.functions().httpsCallable('getSubmittedEvents');
+const acceptSubmittedEvents = firebase.functions().httpsCallable('acceptSubmittedEvents');
+const updateUserDetails = firebase.functions().httpsCallable('updateUserDetails');
+const submitEvent = firebase.functions().httpsCallable('submitEvent');
+const addCalendarEvent = firebase.functions().httpsCallable('addCalendarEvent');
+const getCalendarEvents = firebase.functions().httpsCallable('getCalendarEvents');
+
+// GOOGLE FIREBASE MESSAGING
 const messaging = firebase.messaging()
 
 window.onload = function () {
@@ -163,22 +172,23 @@ window.onload = function () {
 
 			setSigninStatus(isSignedIn) {
 				let vm = this;
-				let googleAuth = vm.api.auth2.getAuthInstance()
-				let currentUser = googleAuth.currentUser.get();
 
+				// GOOGLE LOGIN
+				let googleAuth = vm.api.auth2.getAuthInstance()
+				let currentUser = googleAuth.currentUser.get()
+				
 				// fetching en passant Google account email & modifying UI as appropriate
 				this.gUserEmail = currentUser.getBasicProfile().getEmail()
-				this.locked = true
-				this.emailNotif = this.gUserEmail
-
 				let isAuthorized = currentUser.hasGrantedScopes(SCOPES);
 				if (isAuthorized) this.updateUI(true)
-				else this.updateUI(false)
+				else {
+					this.updateUI(false)
+					return
+				}
 
-				// re-uses Google auth to manually log the user into Firebase
+				// FIREBASE LOGIN
 				let unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
 					unsubscribe();
-
 					if (firebaseUser) {
 						let providerData = firebaseUser.providerData;
 						for (let i = 0; i < providerData.length; i++) {
@@ -188,25 +198,17 @@ window.onload = function () {
 							}
 						}
 					}
-
 					let token = currentUser.getAuthResponse().id_token
 					let credential = firebase.auth.GoogleAuthProvider.credential(token)
-
-					// loggin into firebase & checking if user is already subscribed, responding as appropriate
-					let userRef = db.collection('swiss-wutan-subscribed').doc(this.gUserEmail)
+					// loggin into firebase & checking if user is already subscribed, acquiring as much data as available
 					return firebase.auth().signInWithCredential(credential)
 						.catch(error => console.log(JSON.stringify(error)))
-						.then(() => userRef.get())
-						.then(doc => {
-							if (!doc.exists) userRef.set({ 'email': this.gUserEmail, 'created_on': firebase.firestore.FieldValue.serverTimestamp() })
-							else if (doc.data().notifs_prefs) this.notifs_prefs = doc.data().notifs_prefs
-						})
-					//}
 				})
 
 			},
 
 			initMessaging() {
+				// CLOUD MESSAGING TOKEN INIT + UPDATE LISTENER
 				messaging.usePublicVapidKey("BJV_rKOrznrxId6JaxqYzlt7HcHjCK-c5S4062SL-dCqDtDkFs5fxifKdAtSyy3OIovPzhRC_O33reZbzBa1O6E");
 				messaging.onTokenRefresh(() => {
 					messaging.getToken().then((refreshedToken) => {
@@ -234,6 +236,16 @@ window.onload = function () {
 					this.pullSubmittedEvents().then(() => {
 						this.authorized = true;
 						this.active_tab = 0
+						this.locked = true
+						let userRef = db.collection('swiss-wutan-subscribed').doc(this.gUserEmail)
+						userRef.get().then(doc => {
+							if (!doc.exists) userRef.set({ 'email': this.gUserEmail, 'created_on': firebase.firestore.FieldValue.serverTimestamp() })
+							else {
+								this.notifs_prefs = doc.data().notifs_prefs || []
+								this.token = doc.data().token ||''
+								this.emailNotif = this.gUserEmail
+							}
+						})
 					})
 				} else {
 					this.submittedEvents = []
@@ -378,15 +390,18 @@ window.onload = function () {
 			},
 
 			testPush() {
+
+				// ACQUIRING WEB PUSH PERMISSIONS
 				Notification.requestPermission().then((permission) => {
 					if (permission === 'granted') {
+
+						// ASKING FOR TOKEN
 						// subsequent calls to getToken will return from cache.
 						messaging.getToken().then((currentToken) => {
 							if (currentToken) {
-								db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({'push_token':currentToken})
+								if (currentToken !== this.token) db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({'push_token':currentToken})
 								setTimeout(() => { this.sendPush(currentToken); }, 2000)
 								alert('A notification will be issued after you close this window. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')
-								//return this.sendPush(currentToken)
 							} else {
 								console.log('No Instance ID token available. Request permission to generate one.');
 								console.log('Got this token', currentToken)

@@ -7,18 +7,18 @@ admin.initializeApp();
 function getConcerned(event_topics) {
     // returns emails & tokens of those whose topics intersect event_topics
     return admin.firestore().collection('swiss-wutan-subscribed').get()
-    .then(snap => {
-        let concerned = snap.docs.filter(doc => {
-            let notifs_prefs = doc.data().notifs_prefs || null 
-            let topics = doc.data().topics || null
-            if (notifs_prefs && topics && topics.length>0 && notifs_prefs.length > 0 && event_topics.some(et => topics.includes(et))){
-                return true
-            }
+        .then(snap => {
+            let concerned = snap.docs.filter(doc => {
+                let notifs_prefs = doc.data().notifs_prefs || null
+                let topics = doc.data().topics || null
+                if (notifs_prefs && topics && topics.length > 0 && notifs_prefs.length > 0 && event_topics.some(et => topics.includes(et))) {
+                    return true
+                }
+            })
+            let emails = concerned.filter(doc => doc.data().notifs_prefs.includes('Email') && doc.data().email).map(doc => doc.data().email)
+            let tokens = concerned.filter(doc => doc.data().notifs_prefs.includes('Web push') && doc.data().push_token).map(doc => doc.data().push_token)
+            return { emails: emails, tokens: tokens }
         })
-        let emails = concerned.filter(doc => doc.data().notifs_prefs.includes('Email') && doc.data().email).map(doc => doc.data().email)
-        let tokens = concerned.filter(doc => doc.data().notifs_prefs.includes('Web push') && doc.data().push_token).map(doc => doc.data().push_token)
-        return {emails:emails, tokens:tokens}
-    })
 }
 
 function sendPush(addressee_token, summary) {
@@ -64,7 +64,12 @@ exports.notifySubscribed = functions.firestore.document('swiss-wutan-events/{eve
     const oldData = change.before.data();
     if (newData.validation_status === 'accepted' && oldData.validation_status === 'submitted') {
         return getConcerned(newData.topics).then(res => {
-            return Promise.all([sendEmail(res.emails, newData.summary), ...res.tokens.map(token => sendPush(token, newData.summary))])
+            return Promise.all(
+                [
+                    sendEmail(res.emails, newData.summary),
+                    ...res.tokens.map(token => sendPush(token, newData.summary))
+                ]
+            )
         }).catch(err => console.error('Found error in notifySubscribed', err))
     } else return Promise.reject()
 
@@ -73,23 +78,23 @@ exports.notifySubscribed = functions.firestore.document('swiss-wutan-events/{eve
 exports.getOrCreateUser = functions.https.onCall((data, context) => {
     let userRef = admin.firestore().collection('swiss-wutan-subscribed').doc(data.gUserEmail)
     return admin.firestore().collection('swiss-wutan-subscribed').doc(data.gUserEmail)
-    .get()
-    .then(doc => {
-        if (doc.exists) return doc.data()
-            else return userRef.set({ 'email': data.gUserEmail, 'created_on': admin.firestore.ServerValue.TIMESTAMP})
+        .get()
+        .then(doc => {
+            if (doc.exists) return doc.data()
+            else return userRef.set({ 'email': data.gUserEmail, 'created_on': admin.firestore.ServerValue.TIMESTAMP })
         })
 })
 
 exports.updateUserToken = functions.https.onCall((data, context) => {
     return admin.firestore().collection('swiss-wutan-subscribed').doc(data.gUserEmail)
-    .update({ 'push_token': data.token })
+        .update({ 'push_token': data.token })
 
 })
 exports.getSubmittedEvents = functions.https.onCall((data, context) => {
     return admin.firestore().collection('swiss-wutan-events').where("validation_status", "==", "submitted")
-    .get()
-    .then(snap => data.submittedEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
-    .catch(err => console.log(JSON.stringify(err)))
+        .get()
+        .then(snap => data.submittedEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+        .catch(err => console.log(JSON.stringify(err)))
 })
 
 exports.acceptSubmittedEvents = functions.https.onCall((data, context) => {
@@ -99,48 +104,52 @@ exports.acceptSubmittedEvents = functions.https.onCall((data, context) => {
 
 exports.updateUserDetails = functions.https.onCall((data, context) => {
     return admin.firestore().collection('swiss-wutan-subscribed').doc(data.gUserEmail)
-    .update({ 'notifs_prefs':data.notifs_prefs, 'email': data.email, 'topics': data.topics })
+        .update({ 'notifs_prefs': data.notifs_prefs, 'email': data.email, 'topics': data.topics })
+})
+
+exports.submitEvent = functions.https.onCall((data, context) => {
+    return admin.firestore().collection('swiss-wutan-events').add(data)
 })
 
 exports.addCalendarEvent = functions.https.onCall((data, context) => {
-	const gCalFields = ['status', 'updated', 'htmlLink', 'summary', 'description', 'location', 'start', 'end', 'organizer', 'creator', 'source', 'reminders']
-	const sanitize = (event) => {
-		for (let k in event) {
-			if (!gCalFields.includes(k)) delete event[k]
-		}
-	return event
-	}
+    const gCalFields = ['status', 'updated', 'htmlLink', 'summary', 'description', 'location', 'start', 'end', 'organizer', 'creator', 'source', 'reminders']
+    const sanitize = (event) => {
+        for (let k in event) {
+            if (!gCalFields.includes(k)) delete event[k]
+        }
+        return event
+    }
 
-	return Promise.all(data.events.map(e => {
-			// FIX ME: check path to calendar object
-			let r = api.client.calendar.events.insert({
-				'calendarId': CALENDAR_ID,
-				'resource': sanitize(e)
-			})
-			return r.execute()
-	}))
+    return Promise.all(data.events.map(e => {
+        // FIX ME: check path to calendar object
+        let r = api.client.calendar.events.insert({
+            'calendarId': CALENDAR_ID,
+            'resource': sanitize(e)
+        })
+        return r.execute()
+    }))
 })
 
 exports.getCalendarEvents = functions.https.onCall((data, context) => {
     // FIX ME: check path to calendar object
-	return api.client.calendar.events.list({
-		'calendarId': CALENDAR_ID,
-		'timeMin': (new Date()).toISOString(),
-		'showDeleted': false,
-		'singleEvents': true,
-		'maxResults': 10,
-		'orderBy': 'startTime'
-	}).then(response => {
-		return response.result.items.map(e => {
-			return {
-				'local_id': Math.floor(Math.random() * Math.floor(1000)).toString(),
-				'validation_status': 'accepted',
-				'summary': e.summary,
-				'description': e.description,
-				'location': e.location,
-				'start': { 'dateTime': e.start.dateTime },
-				'end': { 'dateTime:': e.end.dateTime }
-			}
-		})
-	})
+    return api.client.calendar.events.list({
+        'calendarId': CALENDAR_ID,
+        'timeMin': (new Date()).toISOString(),
+        'showDeleted': false,
+        'singleEvents': true,
+        'maxResults': 10,
+        'orderBy': 'startTime'
+    }).then(response => {
+        return response.result.items.map(e => {
+            return {
+                'local_id': Math.floor(Math.random() * Math.floor(1000)).toString(),
+                'validation_status': 'accepted',
+                'summary': e.summary,
+                'description': e.description,
+                'location': e.location,
+                'start': { 'dateTime': e.start.dateTime },
+                'end': { 'dateTime:': e.end.dateTime }
+            }
+        })
+    })
 })
