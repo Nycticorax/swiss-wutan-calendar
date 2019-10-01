@@ -242,7 +242,7 @@ window.onload = function () {
 						getOrCreateUser({gUserEmail:this.gUserEmail}).then(data => {
 							if (data.data.res !== 'false') {
 								this.notifs_prefs = data.data.res.notifs_prefs || []
-								this.token = data.data.stoken || ''
+								this.token = data.data.token || ''
 								this.emailNotif = this.gUserEmail
 							}
 						})
