@@ -4,7 +4,7 @@
 * [x] Web push notifications
 * [x] Email notifications
 * [x] Organizing event in categories and letting users subscribe for receiving relevant notifications		
-* [] Moving GCal & Firestore requests to Firebase Cloud Functions:
+* [-] Moving GCal & Firestore requests to Firebase Cloud Functions:
   * [] GCal writes
-  * [] Firestore reads
-  * [] Firestore writes
+  * [x] Firestore reads
+  * [x] Firestore writes
