@@ -80,8 +80,11 @@ exports.getOrCreateUser = functions.https.onCall((data, context) => {
     return admin.firestore().collection('swiss-wutan-subscribed').doc(data.gUserEmail)
         .get()
         .then(doc => {
-            if (doc.exists) return doc.data()
-            else return userRef.set({ 'email': data.gUserEmail, 'created_on': admin.firestore.ServerValue.TIMESTAMP })
+            if (doc.exists) return {res: doc.data()}
+            else {
+                userRef.set({ 'email': data.gUserEmail, 'created_on': admin.firestore.ServerValue.TIMESTAMP })
+                return {res: 'false'}
+            }
         })
 })
 
@@ -90,10 +93,10 @@ exports.updateUserToken = functions.https.onCall((data, context) => {
         .update({ 'push_token': data.token })
 
 })
-exports.getSubmittedEvents = functions.https.onCall((data, context) => {
+exports.getSubmittedEvents = functions.https.onCall((context) => {
     return admin.firestore().collection('swiss-wutan-events').where("validation_status", "==", "submitted")
         .get()
-        .then(snap => data.submittedEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+        .then(snap => ({res: snap.docs.map(doc => ({ id: doc.id, ...doc.data() })) }))
         .catch(err => console.log(JSON.stringify(err)))
 })
 
@@ -140,7 +143,7 @@ exports.getCalendarEvents = functions.https.onCall((data, context) => {
         'maxResults': 10,
         'orderBy': 'startTime'
     }).then(response => {
-        return response.result.items.map(e => {
+        return {res: response.result.items.map(e => {
             return {
                 'local_id': Math.floor(Math.random() * Math.floor(1000)).toString(),
                 'validation_status': 'accepted',
@@ -149,7 +152,8 @@ exports.getCalendarEvents = functions.https.onCall((data, context) => {
                 'location': e.location,
                 'start': { 'dateTime': e.start.dateTime },
                 'end': { 'dateTime:': e.end.dateTime }
-            }
-        })
+                }
+            })
+        }
     })
 })

@@ -24,13 +24,14 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore()
 
 const getOrCreateUser = firebase.functions().httpsCallable('getOrCreateUser');
-const updateUserToken = firebase.functions().httpsCallable('getOrCreateUser');
+const updateUserToken = firebase.functions().httpsCallable('updateUserToken');
 const getSubmittedEvents = firebase.functions().httpsCallable('getSubmittedEvents');
 const acceptSubmittedEvents = firebase.functions().httpsCallable('acceptSubmittedEvents');
 const updateUserDetails = firebase.functions().httpsCallable('updateUserDetails');
 const submitEvent = firebase.functions().httpsCallable('submitEvent');
-const addCalendarEvent = firebase.functions().httpsCallable('addCalendarEvent');
-const getCalendarEvents = firebase.functions().httpsCallable('getCalendarEvents');
+// TO ADD EVENTUALLY
+//const addCalendarEvent = firebase.functions().httpsCallable('addCalendarEvent');
+//const getCalendarEvents = firebase.functions().httpsCallable('getCalendarEvents');
 
 // GOOGLE FIREBASE MESSAGING
 const messaging = firebase.messaging()
@@ -176,7 +177,7 @@ window.onload = function () {
 				// GOOGLE LOGIN
 				let googleAuth = vm.api.auth2.getAuthInstance()
 				let currentUser = googleAuth.currentUser.get()
-				
+
 				// fetching en passant Google account email & modifying UI as appropriate
 				this.gUserEmail = currentUser.getBasicProfile().getEmail()
 				let isAuthorized = currentUser.hasGrantedScopes(SCOPES);
@@ -186,7 +187,7 @@ window.onload = function () {
 					return
 				}
 
-				// FIREBASE LOGIN
+				// FIREBASE LOGIN, depends on GOOGLE LOGIN
 				let unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
 					unsubscribe();
 					if (firebaseUser) {
@@ -213,7 +214,7 @@ window.onload = function () {
 				messaging.onTokenRefresh(() => {
 					messaging.getToken().then((refreshedToken) => {
 						console.log('Token refreshed.');
-						db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({ 'push_token': refreshedToken })
+						updateUserToken({gUserEmail:this.gUserEmail, token:refreshedToken})
 					}).catch((err) => {
 						console.log('Unable to retrieve refreshed token ', err);
 						showToken('Unable to retrieve refreshed token ', err);
@@ -231,18 +232,17 @@ window.onload = function () {
 				this.setSigninStatus()
 			},
 
-			updateUI(verdict) {
-				if (verdict) {
-					this.pullSubmittedEvents().then(() => {
+			updateUI(is_authorized) {
+				if (is_authorized) {
+					getSubmittedEvents().then(data => {
+						this.submittedEvents = data.data.res // ???
 						this.authorized = true;
 						this.active_tab = 0
 						this.locked = true
-						let userRef = db.collection('swiss-wutan-subscribed').doc(this.gUserEmail)
-						userRef.get().then(doc => {
-							if (!doc.exists) userRef.set({ 'email': this.gUserEmail, 'created_on': firebase.firestore.FieldValue.serverTimestamp() })
-							else {
-								this.notifs_prefs = doc.data().notifs_prefs || []
-								this.token = doc.data().token ||''
+						getOrCreateUser({gUserEmail:this.gUserEmail}).then(data => {
+							if (data.data.res !== 'false') {
+								this.notifs_prefs = data.data.res.notifs_prefs || []
+								this.token = data.data.stoken || ''
 								this.emailNotif = this.gUserEmail
 							}
 						})
@@ -269,13 +269,6 @@ window.onload = function () {
 					.then(_ => {
 						this.updateUI(false)
 					});
-			},
-
-			// Pull submitted events from firestore
-			pullSubmittedEvents() {
-				return db.collection('swiss-wutan-events').where("validation_status", "==", "submitted").get()
-					.then(snap => this.submittedEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
-					.catch(err => console.log(JSON.stringify(err)))
 			},
 
 			// Pull events from Calendar API
@@ -317,18 +310,17 @@ window.onload = function () {
 				}
 				const events = this.selectedEvents.filter(e => e['validation_status'] === 'submitted')
 
-				Promise.all(events.map(e => db.collection('swiss-wutan-events').doc(e.id).update({ 'validation_status': 'accepted' })))
-					.then(() => {
-						events.forEach(e => {
-							let r = vm.api.client.calendar.events.insert({
-								'calendarId': CALENDAR_ID,
-								'resource': sanitize(e)
-							})
-							r.execute(() => {
-								this.updateUI(this.authorized)
-							})
+				acceptSubmittedEvents({events_ids: this.events.map(e => e.id)}).then(() => {
+					events.forEach(e => {
+						let r = vm.api.client.calendar.events.insert({
+							'calendarId': CALENDAR_ID,
+							'resource': sanitize(e)
+						})
+						r.execute(() => {
+							this.updateUI(this.authorized)
 						})
 					})
+				})
 
 			},
 
@@ -378,11 +370,7 @@ window.onload = function () {
 
 			subUnsub(verdict) {
 				let email = verdict ? this.emailNotif : this.gUserEmail
-				db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({
-					'notifs_prefs': this.notifs_prefs,
-					'email': email,
-					'topics': this.topics
-				})
+				updateUserDetails({gUserEmail:this.gUserEmail, notifs_prefs:this.notifs_prefs, email:email, topics:this.topics})
 			},
 
 			testEmail() {
@@ -399,7 +387,7 @@ window.onload = function () {
 						// subsequent calls to getToken will return from cache.
 						messaging.getToken().then((currentToken) => {
 							if (currentToken) {
-								if (currentToken !== this.token) db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({'push_token':currentToken})
+								if (currentToken !== this.token) updateUserToken({gUserEmail:this.gUserEmail, token:currentToken})
 								setTimeout(() => { this.sendPush(currentToken); }, 2000)
 								alert('A notification will be issued after you close this window. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')
 							} else {
