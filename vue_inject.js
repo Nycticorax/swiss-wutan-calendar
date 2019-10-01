@@ -182,6 +182,7 @@ window.onload = function () {
 					if (!this.alreadySignedIn(currentUser, firebaseUser)) {
 						// Build Firebase credential with the Google ID token.
 						let token = currentUser.getAuthResponse().id_token
+						if (!token) return
 						let credential = firebase.auth.GoogleAuthProvider.credential(token)
 						// Sign in with credential from the Google user.
 						firebase.auth().signInWithCredential(credential).catch(err => {
