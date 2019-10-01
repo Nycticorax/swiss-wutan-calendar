@@ -1,6 +1,6 @@
 const t0 = performance.now()
 
-/* GOOGLE APIs CLIENT CREDENTIALS */
+/* GOOGLE APIs CALENDAR CREDENTIALS */
 const CLIENT_ID = '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw';
 // Array of API discovery doc URLs for APIs used by the quickstart
@@ -161,7 +161,7 @@ window.onload = function () {
 				})
 			},
 
-			setSigninStatus(isSignedIn) {
+			setSigninStatus() {
 				let vm = this;
 				let googleAuth = vm.api.auth2.getAuthInstance()
 				let currentUser = googleAuth.currentUser.get();
@@ -260,7 +260,7 @@ window.onload = function () {
 		},
 
 		// Sign in
-		handleAuthClick(event) {
+		handleAuthClick() {
 			Promise.resolve(this.api.auth2.getAuthInstance().signIn())
 				.then(_ => {
 					this.updateUI(true)
@@ -268,7 +268,7 @@ window.onload = function () {
 		},
 
 		// Sign out
-		handleSignoutClick(event) {
+		handleSignoutClick() {
 			Promise.all([this.api.auth2.getAuthInstance().signOut(),firebase.auth().signOut()])
 				.then(() => {
 					this.updateUI(false)
