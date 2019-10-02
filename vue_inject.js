@@ -1,15 +1,14 @@
 const t0 = performance.now()
-/*
+
 // GOOGLE APIs CLIENT CREDENTIALS
-const CLIENT_ID = '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw';
-// Array of API discovery doc URLs for APIs used by the quickstart
-const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'];
-// Authorization scopes required by the API; multiple scopes can be
-// included, separated by spaces.
-const SCOPES = 'https://www.googleapis.com/auth/calendar'//, 'https://www.googleapis.com/auth/cloud-platform'];
-const CALENDAR_ID = '3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com'
-*/
+const calConfig = {
+	apiKey: '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com',
+	clientId: 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw',
+	discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+	scopes: 'https://www.googleapis.com/auth/calendar',
+	calendarId:'3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com',
+}
+gapi.load('client:auth2', initClient)
 // GOOGLE FIREBASE CLIENT CREDENTIALS
 const firebaseConfig = {
 	apiKey: "AIzaSyBn9ur32UG9DkmN74HYciXzcp7uoJ2hwuU",
@@ -162,9 +161,13 @@ window.onload = function () {
 			},
 
 			checkSignedIn(){
+				//let vm = this
 				let unsubscribe = firebase.auth().onAuthStateChanged(firebaseUser => {
 					unsubscribe();
-					if (firebaseUser) this.updateUI(true)
+					if (firebaseUser) {
+						this.gUserEmail = firebaseUser.email
+						gapi.client.init(calConfig).then(gapi=> this.updateUI(true))
+					}
 				})
 			},
 
