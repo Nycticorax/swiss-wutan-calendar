@@ -78,8 +78,8 @@
 						</v-toolbar>
 						<v-card class="d-flex pa-2" outlined tile>
 							<v-card-actions>
-								<v-btn v-if="!authorized" @click="signIn">Log in</v-btn>
-								<v-btn v-else @click="signOut">Log out</v-btn>
+								<v-btn v-if="!authorized" @click="signIn()">Log in</v-btn>
+								<v-btn v-else @click="signOut()">Log out</v-btn>
 							</v-card-actions>
 							<v-card-text>Acquire admin credentials here. Please note that you will need a Google Account
 								to make the most of this demo. Email + password login will be available.</v-card-text>

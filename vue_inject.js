@@ -166,15 +166,14 @@ window.onload = function () {
 			},
 
 			checkSignedIn(){
-				//let vm = this
-				let unsubscribe = firebase.auth().onAuthStateChanged(firebaseUser => {
-					unsubscribe();
-					if (firebaseUser) {
-						this.gUserEmail = firebaseUser.email
-						this.updateUI(true)
-						//FIX ME gapi.client.init(calConfig).then(gapi=> this.updateUI(true))
+				firebase.auth().onAuthStateChanged((user) => {
+					if (user) {
+					  this.gUserEmail = user.email
+					  this.updateUI(true)
+					} else {
+					  this.updateUI(false)
 					}
-				})
+				  });				  
 			},
 
 			signIn(){
@@ -182,8 +181,10 @@ window.onload = function () {
 				provider.addScope('https://www.googleapis.com/auth/calendar');
 				firebase.auth().signInWithPopup(provider).then(function(result) {
 					// This gives you a Google Access Token. You can use it to access the Google API.
+					//this.updateUI(true)
+					this.updateUI(true)
 					let token = result.credential.accessToken
-					gapi.client.setToken(token)
+					//gapi.client.setToken(token)
 					console.log('User signed in: ', user)
 					// ...
 				  }).catch(function(error) {
@@ -200,9 +201,10 @@ window.onload = function () {
 			},
 
 			signOut() {
-				firebase.auth().signOut()
-				console.log('User signed out')
-				this.updateUI('false')
+				firebase.auth().signOut().then(() => {
+					console.log('User signed out')
+					this.updateUI(false)
+				})
 			},
 
 			updateUI(is_authorized) {
@@ -228,7 +230,8 @@ window.onload = function () {
 					this.authorized = false;
 					this.active_tab = 1
 				}
-				this.pullScheduled()
+				//this.pullScheduled()
+				this.authorized = is_authorized
 			},
 
 			// Pull submitted events from firestore
