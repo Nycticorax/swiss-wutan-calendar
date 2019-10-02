@@ -1,19 +1,55 @@
 const t0 = performance.now()
 
 // GOOGLE APIs CLIENT CREDENTIALS
-const calConfig = {
-	apiKey: '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com',
-	clientId: 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw',
-	discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
-	scopes: 'https://www.googleapis.com/auth/calendar',
-	calendarId:'3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com',
-}
+function loadGapiClient() {
+	gapi.load('client:auth2', initClient);
+  }
 
-function loadCalendarAPI(){
-	gapi.load('client:auth2', initClient).then(() => {
-		gapi.client.init(calConfig)
+function initClient() {
+	gapi.client.init(
+		{
+			apiKey: 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw',
+			clientId: '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com',
+			discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+			scopes: 'https://www.googleapis.com/auth/calendar',
+			//calendarId:'3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com',
+		}
+	).then(function () {
+	  // Listen for sign-in state changes.
+	  gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+
+	}, function(error) {
+	  console.log('ERROR', error)
 	})
 }
+function getScheduled(){
+	gapi.client.calendar.events.list({
+		'calendarId': CALENDAR_ID,
+		'timeMin': (new Date()).toISOString(),
+		'showDeleted': false,
+		'singleEvents': true,
+		'maxResults': 10,
+		'orderBy': 'startTime'
+	}).then(response => {
+		return response.result.items.map(e => {
+			return {
+				'local_id': Math.floor(Math.random() * Math.floor(1000)).toString(),
+				'validation_status': 'accepted',
+				'summary': e.summary,
+				'description': e.description,
+				'location': e.location,
+				'start': { 'dateTime': e.start.dateTime },
+				'end': { 'dateTime:': e.end.dateTime }
+			}
+		})
+	});
+}
+
+
+function updateSigninStatus(verdict){
+	console.log('Google Calendar unhappy. Saying', verdict)
+}
+
 // GOOGLE FIREBASE CLIENT CREDENTIALS
 const firebaseConfig = {
 	apiKey: "AIzaSyBn9ur32UG9DkmN74HYciXzcp7uoJ2hwuU",
@@ -129,6 +165,7 @@ window.onload = function () {
 		created() {
 			this.initMessaging()
 			this.checkSignedIn()
+			loadGapiClient()
 		},
 
 		mounted() {
@@ -222,6 +259,7 @@ window.onload = function () {
 									this.notifs_prefs = doc.data().notifs_prefs || []
 									this.token = doc.data().token || ''
 									this.emailNotif = this.gUserEmail
+									this.locked = true
 								}
 							})
 					})
@@ -230,7 +268,7 @@ window.onload = function () {
 					this.authorized = false;
 					this.active_tab = 1
 				}
-				//this.pullScheduled()
+				this.pullScheduled()
 				this.authorized = is_authorized
 			},
 
@@ -243,28 +281,7 @@ window.onload = function () {
 
 			// Pull events from Calendar API
 			pullScheduled() {
-				let vm = this;
-
-				return vm.api.client.calendar.events.list({
-					'calendarId': CALENDAR_ID,
-					'timeMin': (new Date()).toISOString(),
-					'showDeleted': false,
-					'singleEvents': true,
-					'maxResults': 10,
-					'orderBy': 'startTime'
-				}).then(response => {
-					this.events = response.result.items.map(e => {
-						return {
-							'local_id': Math.floor(Math.random() * Math.floor(1000)).toString(),
-							'validation_status': 'accepted',
-							'summary': e.summary,
-							'description': e.description,
-							'location': e.location,
-							'start': { 'dateTime': e.start.dateTime },
-							'end': { 'dateTime:': e.end.dateTime }
-						}
-					})
-				});
+				return getScheduled()
 
 			},
 
