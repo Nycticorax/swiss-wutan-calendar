@@ -103,6 +103,7 @@ window.onload = function () {
 					reminders: ['when added','1 week before'],
 					emailNotif: '',
 					gUserEmail: '',
+					name: '',
 					token: '',
 				},
 				arts_opts: ['Bagua', 'Baji', 'Tai chi', 'Kung Fu', 'Mizongyi', 'Xing Yi'],
@@ -161,9 +162,11 @@ window.onload = function () {
 			},
 
 			checkSignedIn() {
-				firebase.auth().onAuthStateChanged((user) => {
-					if (user) {
-						this.user.gUserEmail = user.email
+				firebase.auth().onAuthStateChanged((firebaseUser) => {
+					if (firebaseUser) {
+						this.user.gUserEmail = firebaseUser.email
+						this.user.name = firebaseUser.displayName
+						this.newNotif = 'Hi again, ' + this.user.name
 						this.updateUI(true)
 					} else {
 						this.updateUI(false)
@@ -217,6 +220,7 @@ window.onload = function () {
 									this.user.token = doc.data().token || ''
 									this.user.emailNotif = this.user.gUserEmail
 									this.user.topics = doc.data().topics
+									this.user.reminders = doc.data().reminders
 									this.locked = true
 								}
 							})
@@ -423,10 +427,10 @@ window.onload = function () {
 				this.refDate = val
 			},
 			snackbar(newVal, oldVal){
-				if (newVal == false && oldVal == true ) this.newNotif = ''
+				if (newVal === false && oldVal === true ) this.newNotif = ''
 			},
 			newNotif(newVal, oldVal){
-				if (newVal !== '' && oldVal === '') this.snackbar = true
+				if (newVal !== '' && oldVal ==='') this.snackbar = true
 			}
 		}
 	});
