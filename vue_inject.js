@@ -8,7 +8,12 @@ const calConfig = {
 	scopes: 'https://www.googleapis.com/auth/calendar',
 	calendarId:'3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com',
 }
-gapi.load('client:auth2', initClient)
+
+function loadCalendarAPI(){
+	gapi.load('client:auth2', initClient).then(() => {
+		gapi.client.init(calConfig)
+	})
+}
 // GOOGLE FIREBASE CLIENT CREDENTIALS
 const firebaseConfig = {
 	apiKey: "AIzaSyBn9ur32UG9DkmN74HYciXzcp7uoJ2hwuU",
@@ -166,7 +171,8 @@ window.onload = function () {
 					unsubscribe();
 					if (firebaseUser) {
 						this.gUserEmail = firebaseUser.email
-						gapi.client.init(calConfig).then(gapi=> this.updateUI(true))
+						this.updateUI(true)
+						//FIX ME gapi.client.init(calConfig).then(gapi=> this.updateUI(true))
 					}
 				})
 			},
@@ -176,9 +182,8 @@ window.onload = function () {
 				provider.addScope('https://www.googleapis.com/auth/calendar');
 				firebase.auth().signInWithPopup(provider).then(function(result) {
 					// This gives you a Google Access Token. You can use it to access the Google API.
-					var token = result.credential.accessToken;
-					// The signed-in user info.
-					var user = result.user;
+					let token = result.credential.accessToken
+					gapi.client.setToken(token)
 					console.log('User signed in: ', user)
 					// ...
 				  }).catch(function(error) {
