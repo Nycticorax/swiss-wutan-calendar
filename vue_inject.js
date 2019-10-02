@@ -1,55 +1,5 @@
 const t0 = performance.now()
 
-// GOOGLE APIs CLIENT CREDENTIALS
-function loadGapiClient() {
-	gapi.load('client:auth2', initClient);
-  }
-
-function initClient() {
-	gapi.client.init(
-		{
-			apiKey: 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw',
-			clientId: '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com',
-			discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
-			scopes: 'https://www.googleapis.com/auth/calendar',
-			//calendarId:'3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com',
-		}
-	).then(function () {
-	  // Listen for sign-in state changes.
-	  gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-
-	}, function(error) {
-	  console.log('ERROR', error)
-	})
-}
-function getScheduled(){
-	gapi.client.calendar.events.list({
-		'calendarId': CALENDAR_ID,
-		'timeMin': (new Date()).toISOString(),
-		'showDeleted': false,
-		'singleEvents': true,
-		'maxResults': 10,
-		'orderBy': 'startTime'
-	}).then(response => {
-		return response.result.items.map(e => {
-			return {
-				'local_id': Math.floor(Math.random() * Math.floor(1000)).toString(),
-				'validation_status': 'accepted',
-				'summary': e.summary,
-				'description': e.description,
-				'location': e.location,
-				'start': { 'dateTime': e.start.dateTime },
-				'end': { 'dateTime:': e.end.dateTime }
-			}
-		})
-	});
-}
-
-
-function updateSigninStatus(verdict){
-	console.log('Google Calendar unhappy. Saying', verdict)
-}
-
 // GOOGLE FIREBASE CLIENT CREDENTIALS
 const firebaseConfig = {
 	apiKey: "AIzaSyBn9ur32UG9DkmN74HYciXzcp7uoJ2hwuU",
@@ -82,7 +32,7 @@ window.onload = function () {
 				navItems: [{ title: 'Introduction', target: '#intro' }, { title: 'Authentication', target: '#auth' }, { title: 'Manage events', target: '#manage' }, { title: 'Google Calendar', target: '#gCal' }, { title: 'Submit new events', target: '#submit' }, { title: 'Subscribe to new events', target: '#subscribe' }],
 				nav: true,
 				submittedEvents: [],
-				events: [],
+				pulledEvents: [],
 				search: '',
 				submittedEvents_headers: [
 					{ text: 'Title', value: 'summary', sortable: 'true' },
@@ -163,9 +113,10 @@ window.onload = function () {
 		},
 
 		created() {
+			this.api = gapi
+			this.loadGapiClient()
 			this.initMessaging()
 			this.checkSignedIn()
-			loadGapiClient()
 		},
 
 		mounted() {
@@ -173,6 +124,9 @@ window.onload = function () {
 		},
 
 		computed: {
+			events() {
+				return this.pulledEvents.length > 0 ? this.pulledEvents : []
+			},
 			thisMonthEvents() {
 				return this.events.filter(e => this.refDate.substr(0, 7) == e.start.dateTime.substr(0, 7))
 			},
@@ -268,8 +222,48 @@ window.onload = function () {
 					this.authorized = false;
 					this.active_tab = 1
 				}
-				this.pullScheduled()
 				this.authorized = is_authorized
+			},
+
+			loadGapiClient () {
+				this.api.load('client:auth2', this.initClient)
+			},
+			
+			initClient() {
+				let vm = this
+				vm.api.client.init(
+					{
+						apiKey: 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw',
+						clientId: '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com',
+						discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+						scope: 'https://www.googleapis.com/auth/calendar',
+						calendar:'3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com'
+					}
+				).then(_ => this.pullScheduled()).then(res => this.pulledEvents = res)
+			},
+
+			pullScheduled () {
+				let vm = this
+				return vm.api.client.calendar.events.list({
+					'calendarId': '3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com',
+					'timeMin': (new Date()).toISOString(),
+					'showDeleted': false,
+					'singleEvents': true,
+					'maxResults': 10,
+					'orderBy': 'startTime'
+				}).then(response => {
+					return response.result.items.map(e => {
+						return {
+							'local_id': Math.floor(Math.random() * Math.floor(1000)).toString(),
+							'validation_status': 'accepted',
+							'summary': e.summary,
+							'description': e.description,
+							'location': e.location,
+							'start': { 'dateTime': e.start.dateTime },
+							'end': { 'dateTime:': e.end.dateTime }
+						}
+					})
+				})
 			},
 
 			// Pull submitted events from firestore
@@ -277,12 +271,6 @@ window.onload = function () {
 				return db.collection('swiss-wutan-events').where("validation_status", "==", "submitted").get()
 					.then(snap => snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
 					//.catch(err => console.log(JSON.stringify(err)))
-			},
-
-			// Pull events from Calendar API
-			pullScheduled() {
-				return getScheduled()
-
 			},
 
 			// Accept or reject events
