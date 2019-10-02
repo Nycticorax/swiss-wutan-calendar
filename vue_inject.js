@@ -148,6 +148,7 @@ window.onload = function () {
 				messaging.onTokenRefresh(() => {
 					messaging.getToken().then((refreshedToken) => {
 						console.log('Token refreshed.');
+						this.user.token = refreshedToken
 						db.collection('swiss-wutan-subscribed').doc(this.user.gUserEmail).update({ 'push_token': refreshedToken })
 					}).catch((err) => {
 						console.log('Unable to retrieve refreshed token ', err);
@@ -179,21 +180,10 @@ window.onload = function () {
 				provider.addScope('https://www.googleapis.com/auth/calendar');
 				firebase.auth().signInWithPopup(provider).then(function (result) {
 					// This gives you a Google Access Token. You can use it to access the Google API.
-					//this.updateUI(true)
 					this.updateUI(true)
-					let token = result.credential.accessToken
-					//gapi.client.setToken(token)
-					console.log('User signed in: ', user)
-					// ...
+					//let token = result.credential.accessToken
 				}).catch(function (error) {
-					// Handle Errors here.
-					var errorCode = error.code;
-					var errorMessage = error.message;
-					// The email of the user's account used.
-					var email = error.email;
-					// The firebase.auth.AuthCredential type that was used.
-					var credential = error.credential;
-					// ...
+					console.error(error)	
 				});
 
 			},
@@ -219,8 +209,8 @@ window.onload = function () {
 									this.user.notifs_prefs = doc.data().notifs_prefs || []
 									this.user.token = doc.data().token || ''
 									this.user.emailNotif = this.user.gUserEmail
-									this.user.topics = doc.data().topics
-									this.user.reminders = doc.data().reminders
+									this.user.topics = doc.data().topics || []
+									this.user.reminders = doc.data().reminders || []
 									this.locked = true
 								}
 							})
@@ -278,7 +268,7 @@ window.onload = function () {
 			pullSubmittedEvents() {
 				return db.collection('swiss-wutan-events').where("validation_status", "==", "submitted").get()
 					.then(snap => snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
-				//.catch(err => console.log(JSON.stringify(err)))
+					.catch(err => console.log(JSON.stringify(err)))
 			},
 
 			// Accept or reject events
@@ -297,7 +287,7 @@ window.onload = function () {
 					.then(() => {
 						events.forEach(e => {
 							let r = vm.api.client.calendar.events.insert({
-								'calendarId': CALENDAR_ID,
+								'calendarId': '3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com',
 								'resource': sanitize(e)
 							})
 							r.execute(() => {
@@ -379,7 +369,6 @@ window.onload = function () {
 								db.collection('swiss-wutan-subscribed').doc(this.user.gUserEmail).update({ 'push_token': currentToken })
 								setTimeout(() => { this.sendPush(currentToken); }, 2000)
 								alert('A notification will be issued after you close this window. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')
-								//return this.sendPush(currentToken)
 							} else {
 								console.log('No Instance ID token available. Request permission to generate one.');
 								console.log('Got this token', currentToken)
