@@ -1,5 +1,5 @@
 const t0 = performance.now()
-
+/*
 // GOOGLE APIs CLIENT CREDENTIALS
 const CLIENT_ID = '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw';
@@ -9,7 +9,7 @@ const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/calendar/v
 // included, separated by spaces.
 const SCOPES = 'https://www.googleapis.com/auth/calendar'//, 'https://www.googleapis.com/auth/cloud-platform'];
 const CALENDAR_ID = '3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com'
-
+*/
 // GOOGLE FIREBASE CLIENT CREDENTIALS
 const firebaseConfig = {
 	apiKey: "AIzaSyBn9ur32UG9DkmN74HYciXzcp7uoJ2hwuU",
@@ -162,25 +162,10 @@ window.onload = function () {
 			},
 
 			checkSignedIn(){
-				firebase.auth().getRedirectResult().then(function(result) {
-					if (result.credential) {
-					  // This gives you a Google Access Token. You can use it to access the Google API.
-					  var token = result.credential.accessToken;
-					  // ...
-					}
-					// The signed-in user info.
-					var user = result.user;
-				  }).catch(function(error) {
-					// Handle Errors here.
-					var errorCode = error.code;
-					var errorMessage = error.message;
-					// The email of the user's account used.
-					var email = error.email;
-					// The firebase.auth.AuthCredential type that was used.
-					var credential = error.credential;
-					// ...
-				  });
-				  
+				let unsubscribe = firebase.auth().onAuthStateChanged(firebaseUser => {
+					unsubscribe();
+					if (firebaseUser) this.updateUI(true)
+				})
 			},
 
 			signIn(){
@@ -191,6 +176,7 @@ window.onload = function () {
 					var token = result.credential.accessToken;
 					// The signed-in user info.
 					var user = result.user;
+					console.log('User signed in: ', user)
 					// ...
 				  }).catch(function(error) {
 					// Handle Errors here.
@@ -207,6 +193,8 @@ window.onload = function () {
 
 			signOut() {
 				firebase.auth().signOut()
+				console.log('User signed out')
+				this.updateUI('false')
 			},
 
 			updateUI(is_authorized) {
