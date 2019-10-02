@@ -26,8 +26,6 @@ window.onload = function () {
 			return {
 				// operational stuff
 				api: undefined,
-				gUserEmail: '',
-				token: '',
 				authorized: false,
 				navItems: [{ title: 'Introduction', target: '#intro' }, { title: 'Authentication', target: '#auth' }, { title: 'Manage events', target: '#manage' }, { title: 'Google Calendar', target: '#gCal' }, { title: 'Submit new events', target: '#submit' }, { title: 'Subscribe to new events', target: '#subscribe' }],
 				nav: true,
@@ -97,15 +95,22 @@ window.onload = function () {
 					registration: null,
 					registration_details: '',
 					comment: '',
+					topics: ['Wutan Official', 'CH Seminars', 'TW Seminars'],
+				},
+				user: {
+					topics: ['Wutan Official'],
+					notifs_prefs: ['Email', 'Web push'],
+					reminders: ['when added','1 week before'],
+					emailNotif: '',
+					gUserEmail: '',
+					token: '',
 				},
 				arts_opts: ['Bagua', 'Baji', 'Tai chi', 'Kung Fu', 'Mizongyi', 'Xing Yi'],
 				levels_opts: ['Beginners', 'Advanced'],
 				fillFrom_opts: ['fill from email', 'fill from phone', 'fill from school'],
-				emailNotif: '',
 				topics_opts: ['Wutan Official', 'CH Seminars', 'TW Seminars'],
-				topics: ['Wutan Official', 'CH Seminars', 'TW Seminars'],
+				reminders_opts:['when added','when updated or cancelled', '1 week before','2 days before'],
 				locked: false,
-				notifs_prefs: ['Email', 'Web push'],
 				notifs_opts: ['Email', 'Web push'],
 				snackbar: false,
 				newNotif: '',
@@ -142,7 +147,7 @@ window.onload = function () {
 				messaging.onTokenRefresh(() => {
 					messaging.getToken().then((refreshedToken) => {
 						console.log('Token refreshed.');
-						db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({ 'push_token': refreshedToken })
+						db.collection('swiss-wutan-subscribed').doc(this.user.gUserEmail).update({ 'push_token': refreshedToken })
 					}).catch((err) => {
 						console.log('Unable to retrieve refreshed token ', err);
 						showToken('Unable to retrieve refreshed token ', err);
@@ -151,26 +156,25 @@ window.onload = function () {
 
 				messaging.onMessage((payload) => {
 					this.newNotif = payload['notification']['title'] + '\n' + payload['notification']['body']
-					this.snackbar = true
 				});
 
 			},
 
-			checkSignedIn(){
+			checkSignedIn() {
 				firebase.auth().onAuthStateChanged((user) => {
 					if (user) {
-					  this.gUserEmail = user.email
-					  this.updateUI(true)
+						this.user.gUserEmail = user.email
+						this.updateUI(true)
 					} else {
-					  this.updateUI(false)
+						this.updateUI(false)
 					}
-				  });				  
+				});
 			},
 
-			signIn(){
+			signIn() {
 				const provider = new firebase.auth.GoogleAuthProvider();
 				provider.addScope('https://www.googleapis.com/auth/calendar');
-				firebase.auth().signInWithPopup(provider).then(function(result) {
+				firebase.auth().signInWithPopup(provider).then(function (result) {
 					// This gives you a Google Access Token. You can use it to access the Google API.
 					//this.updateUI(true)
 					this.updateUI(true)
@@ -178,7 +182,7 @@ window.onload = function () {
 					//gapi.client.setToken(token)
 					console.log('User signed in: ', user)
 					// ...
-				  }).catch(function(error) {
+				}).catch(function (error) {
 					// Handle Errors here.
 					var errorCode = error.code;
 					var errorMessage = error.message;
@@ -187,8 +191,8 @@ window.onload = function () {
 					// The firebase.auth.AuthCredential type that was used.
 					var credential = error.credential;
 					// ...
-				  });
-				  
+				});
+
 			},
 
 			signOut() {
@@ -199,20 +203,20 @@ window.onload = function () {
 			},
 
 			updateUI(is_authorized) {
-
 				if (is_authorized) {
 					this.pullSubmittedEvents().then(events => {
 						this.submittedEvents = events
 						this.authorized = true;
 						this.active_tab = 0
-						let userRef = db.collection('swiss-wutan-subscribed').doc(this.gUserEmail)
+						let userRef = db.collection('swiss-wutan-subscribed').doc(this.user.gUserEmail)
 						userRef.get()
 							.then(doc => {
-								if (!doc.exists) userRef.set({ 'email': this.gUserEmail, 'created_on': firebase.firestore.FieldValue.serverTimestamp() })
+								if (!doc.exists) userRef.set({ 'email': this.user.gUserEmail, 'created_on': firebase.firestore.FieldValue.serverTimestamp() })
 								else {
-									this.notifs_prefs = doc.data().notifs_prefs || []
-									this.token = doc.data().token || ''
-									this.emailNotif = this.gUserEmail
+									this.user.notifs_prefs = doc.data().notifs_prefs || []
+									this.user.token = doc.data().token || ''
+									this.user.emailNotif = this.user.gUserEmail
+									this.user.topics = doc.data().topics
 									this.locked = true
 								}
 							})
@@ -225,10 +229,10 @@ window.onload = function () {
 				this.authorized = is_authorized
 			},
 
-			loadGapiClient () {
+			loadGapiClient() {
 				this.api.load('client:auth2', this.initClient)
 			},
-			
+
 			initClient() {
 				let vm = this
 				vm.api.client.init(
@@ -237,12 +241,12 @@ window.onload = function () {
 						clientId: '269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com',
 						discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
 						scope: 'https://www.googleapis.com/auth/calendar',
-						calendar:'3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com'
+						calendar: '3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com'
 					}
 				).then(_ => this.pullScheduled()).then(res => this.pulledEvents = res)
 			},
 
-			pullScheduled () {
+			pullScheduled() {
 				let vm = this
 				return vm.api.client.calendar.events.list({
 					'calendarId': '3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com',
@@ -270,7 +274,7 @@ window.onload = function () {
 			pullSubmittedEvents() {
 				return db.collection('swiss-wutan-events').where("validation_status", "==", "submitted").get()
 					.then(snap => snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
-					//.catch(err => console.log(JSON.stringify(err)))
+				//.catch(err => console.log(JSON.stringify(err)))
 			},
 
 			// Accept or reject events
@@ -312,11 +316,8 @@ window.onload = function () {
 
 			// FIX ME : TALK TO DATABASE
 			submitEvent() {
-				alert('Not implemented yet.')
-				/*
 				if (this.$refs.form.validate()) {
-					this.snackbar = true
-					this.submittedEvents.push({
+					db.collection('swiss-wutan-events').add({
 						'summary': this.eventTitle,
 						'location': this.eventLocation,
 						'description': this.comments,
@@ -327,9 +328,15 @@ window.onload = function () {
 						'end': {
 							'dateTime': this.eventEnd,
 							'timeZone': 'Europe/Zurich'
-						}
+						},
+						'topics': this.topics,
+						'submitted_by': this.user.gUserEmail,
+						'validation_status': 'submitted'
 					})
-				}*/
+					this.newNotif = 'Event submitted!'
+				} else {
+					this.newNotif = 'Please fix the form first.'
+				}
 			},
 
 			reset() {
@@ -345,12 +352,14 @@ window.onload = function () {
 			},
 
 			subUnsub(verdict) {
-				let email = verdict ? this.emailNotif : this.gUserEmail
-				db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({
-					'notifs_prefs': this.notifs_prefs,
+				let email = verdict ? this.user.emailNotif : this.user.gUserEmail
+				db.collection('swiss-wutan-subscribed').doc(this.user.gUserEmail).update({
+					'notifs_prefs': this.user.notifs_prefs,
 					'email': email,
-					'topics': this.topics
-				})
+					'topics': this.user.topics,
+					'reminders': this.user.reminders
+				}).catch(err => this.newNotif = 'An error occurred ' + err)
+				this.newNotif = 'Subscription edited!'
 			},
 
 			testEmail() {
@@ -363,7 +372,7 @@ window.onload = function () {
 						// subsequent calls to getToken will return from cache.
 						messaging.getToken().then((currentToken) => {
 							if (currentToken) {
-								db.collection('swiss-wutan-subscribed').doc(this.gUserEmail).update({ 'push_token': currentToken })
+								db.collection('swiss-wutan-subscribed').doc(this.user.gUserEmail).update({ 'push_token': currentToken })
 								setTimeout(() => { this.sendPush(currentToken); }, 2000)
 								alert('A notification will be issued after you close this window. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification.')
 								//return this.sendPush(currentToken)
@@ -405,7 +414,6 @@ window.onload = function () {
 				}).catch(function (error) {
 					console.error(error);
 				})
-
 			},
 
 
@@ -414,6 +422,12 @@ window.onload = function () {
 			pickerDate(val) {
 				this.refDate = val
 			},
+			snackbar(newVal, oldVal){
+				if (newVal == false && oldVal == true ) this.newNotif = ''
+			},
+			newNotif(newVal, oldVal){
+				if (newVal !== '' && oldVal === '') this.snackbar = true
+			}
 		}
 	});
 }

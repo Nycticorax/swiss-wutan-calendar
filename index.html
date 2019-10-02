@@ -295,8 +295,8 @@
 										</v-col>
 										<!-- MORE CHECKBOXES -->
 										<v-col cols="12" md="6">
-											<v-combobox v-model="topics" multiple chips :items="topics_opts" label="Topics"
-											deletable-chips></v-combobox>
+											<v-combobox v-model="event.topics" multiple chips :items="topics_opts"
+												label="Topics" deletable-chips></v-combobox>
 										</v-col>
 										<v-col cols="12" md="6">
 											<v-checkbox v-model="event.privacy" color="red darken-2"
@@ -306,9 +306,9 @@
 												label="Registration required">
 											</v-checkbox>
 											<div id="register" v-if=event.registration>
-													<v-combobox v-model="event.registration_details" :items="fillFromOpts"
-														filled label="Participants register here (url, email):....">
-													</v-combobox>
+												<v-combobox v-model="event.registration_details" :items="fillFromOpts"
+													filled label="Participants register here (url, email):....">
+												</v-combobox>
 											</div>
 											<v-checkbox v-model="event.discount" color="red darken-2"
 												label="Swiss Wutan members get a special discount">
@@ -343,7 +343,8 @@
 							<v-toolbar-title>Subscribe</v-toolbar-title>
 						</v-toolbar>
 						<!-- <v-card-title></v-card-title> -->
-						<v-card-text>You need to be logged in to use this feature. Here users can manage their subscriptions to 'topics', namely theme-related events
+						<v-card-text>You need to be logged in to use this feature. Here users can manage their
+							subscriptions to 'topics', namely theme-related events
 							about which they want to be notified. Notifications can be sent as emails or web push. Play
 							around to see them in action.</v-card-text>
 						<v-divider></v-divider>
@@ -351,31 +352,36 @@
 							<v-container>
 								<v-row>
 									<v-col cols="12" md="4">
-										<v-text-field v-if="locked" v-model="emailNotif" readonly outlined filled
-											label="Email" :placeholder="gUserEmail || emailNotif || ''"
+										<v-text-field v-if="locked" v-model="user.emailNotif" readonly outlined filled
+											label="Email" :placeholder="user.gUserEmail || user.emailNotif || ''"
 											@click:append-outer="lockUnlock" append-outer-icon="mdi-lock-reset">
 										</v-text-field>
-										<v-text-field v-else v-model="emailNotif" outlined label="Email"
-											:placeholder="gUserEmail || emailNotif || 'Your email'"
+										<v-text-field v-else v-model="user.emailNotif" outlined label="Email"
+											:placeholder="user.gUserEmail || user.emailNotif || 'Your email'"
 											@click:append-outer="lockUnlock" append-outer-icon="mdi-lock-reset">
 										</v-text-field>
 									</v-col>
 									<v-col cols="12" md="4">
-										<v-combobox v-model="notifs_prefs" :items="notifs_opts" multiple chips
+										<v-combobox v-model="user.notifs_prefs" :items="notifs_opts" multiple chips
+											deletable-chips label="Notifications"></v-combobox>
+										<v-combobox v-model="user.reminders" :items="reminders_opts" multiple chips
 											deletable-chips label="Notifications"></v-combobox>
 									</v-col>
 									<v-col cols="12" md="4">
-										<v-combobox v-model="topics" multiple chips :items="topics_opts" label="Topics"
+										<v-combobox v-model="user.topics" multiple chips :items="topics_opts" label="Topics"
 											deletable-chips></v-combobox>
-										<v-btn class="ma-2" outlined text color="primary" @click="testEmail">Test email</v-btn>
+										<v-btn class="ma-2" outlined text color="primary" @click="testEmail">Test email
+										</v-btn>
 										<v-btn class="ma-2" outlined text color="primary" @click="testPush">Test web
 											push</v-btn>
 									</v-col>
 								</v-row>
-								<v-btn v-if="authorized && emailNotif !== gUserEmail" color="success" @click="subUnsub(true)">
+								<v-btn v-if="authorized && user.emailNotif !== user.gUserEmail" color="success"
+									@click="subUnsub(true)">
 									Subscribe</v-btn>
-								<v-btn v-else disabled color="success">Subscribe</v-btn>
-								<v-btn v-if="authorized && emailNotif === gUserEmail" color="warning" @click="subUnsub(false)">
+								<v-btn v-else disabled color="success">Already subscribed</v-btn>
+								<v-btn v-if="authorized && user.emailNotif === user.gUserEmail" color="warning"
+									@click="subUnsub(false)">
 									Edit subscription</v-btn>
 								<v-btn v-else disabled color="error">Unsubscribe</v-btn>
 							</v-container>
