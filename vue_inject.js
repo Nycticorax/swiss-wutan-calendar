@@ -100,7 +100,7 @@ window.onload = function () {
 				user: {
 					topics: ['Wutan Official'],
 					notifs_prefs: ['Email', 'Web push'],
-					reminders: ['when added','1 week before'],
+					reminders: ['added','1 week before'],
 					emailNotif: '',
 					gUserEmail: '',
 					name: '',
@@ -110,7 +110,7 @@ window.onload = function () {
 				levels_opts: ['Beginners', 'Advanced'],
 				fillFrom_opts: ['fill from email', 'fill from phone', 'fill from school'],
 				topics_opts: ['Wutan Official', 'CH Seminars', 'TW Seminars'],
-				reminders_opts:['when added','when updated or cancelled', '1 week before','2 days before'],
+				reminders_opts:['added','updated or cancelled', '1 week before','2 days before'],
 				locked: false,
 				notifs_opts: ['Email', 'Web push'],
 				snackbar: false,
