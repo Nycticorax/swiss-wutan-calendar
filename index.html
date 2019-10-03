@@ -389,8 +389,13 @@
 					</v-card>
 				</v-container>
 			</v-content>
-			<v-snackbar v-if="newNotif" v-model="snackbar">{{ newNotif }}
-				<v-btn color="pink" text @click="snackbar = false">
+			<v-snackbar v-if="newNotif" v-model="notif_snackbar">{{ newNotif }}
+				<v-btn color='pink' text @click="notif_snackbar = false">
+					Close
+				</v-btn>
+			</v-snackbar>
+			<v-snackbar v-if="newWebPush" v-model="push_snackbar" multi-line right color="primary">{{newWebPush}}
+				<v-btn color='white' text @click="push_snackbar = false">
 					Close
 				</v-btn>
 			</v-snackbar>

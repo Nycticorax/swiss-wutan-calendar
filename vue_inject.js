@@ -113,8 +113,10 @@ window.onload = function () {
 				reminders_opts:['added','updated or cancelled', '1 week before','2 days before'],
 				locked: false,
 				notifs_opts: ['Email', 'Web push'],
-				snackbar: false,
+				notif_snackbar: false,
+				push_snackbar: false,
 				newNotif: '',
+				newWebPush:''
 			}
 		},
 
@@ -157,7 +159,7 @@ window.onload = function () {
 				});
 
 				messaging.onMessage((payload) => {
-					this.newNotif = payload['notification']['title'] + '\n' + payload['notification']['body']
+					this.newWebPush = 'NEW NOTIFICATION. ' + payload['notification']['title'] + '\n' + payload['notification']['body']
 				});
 
 			},
@@ -282,6 +284,7 @@ window.onload = function () {
 					return event
 				}
 				const events = this.selectedEvents.filter(e => e['validation_status'] === 'submitted')
+				let nb_events = events.length
 
 				Promise.all(events.map(e => db.collection('swiss-wutan-events').doc(e.id).update({ 'validation_status': 'accepted' })))
 					.then(() => {
@@ -294,6 +297,11 @@ window.onload = function () {
 								this.updateUI(this.authorized)
 							})
 						})
+					})
+					.then(() => this.newNotif = nb_events.toString() + ' event(s) accepted!')
+					.catch(err => {
+						console.error('This went wrong', err)
+						this.newNotif = 'Something went wrong. Please get in touch.'
 					})
 
 			},
@@ -329,7 +337,7 @@ window.onload = function () {
 					})
 					this.newNotif = 'Event submitted!'
 				} else {
-					this.newNotif = 'Please fix the form first.'
+					this.newNotif = 'Please correct the form first.'
 				}
 			},
 
@@ -415,12 +423,12 @@ window.onload = function () {
 			pickerDate(val) {
 				this.refDate = val
 			},
-			snackbar(newVal, oldVal){
-				if (newVal === false && oldVal === true ) this.newNotif = ''
+			newNotif(val){
+				this.notif_snackbar = true
 			},
-			newNotif(newVal, oldVal){
-				if (newVal !== '' && oldVal ==='') this.snackbar = true
-			}
+			newWebPush(val){
+				this.push_snackbar = true
+			},
 		}
 	});
 }
