@@ -100,7 +100,7 @@ window.onload = function () {
 				user: {
 					topics: ['Wutan Official'],
 					notifs_prefs: ['Email', 'Web push'],
-					reminders: ['added','1 week before'],
+					reminders: ['added', '1 week before'],
 					emailNotif: '',
 					gUserEmail: '',
 					name: '',
@@ -110,13 +110,13 @@ window.onload = function () {
 				levels_opts: ['Beginners', 'Advanced'],
 				fillFrom_opts: ['fill from email', 'fill from phone', 'fill from school'],
 				topics_opts: ['Wutan Official', 'CH Seminars', 'TW Seminars'],
-				reminders_opts:['added','updated or cancelled', '1 week before','2 days before'],
+				reminders_opts: ['added', 'updated or cancelled', '1 week before', '2 days before'],
 				locked: false,
 				notifs_opts: ['Email', 'Web push'],
 				notif_snackbar: false,
 				push_snackbar: false,
 				newNotif: '',
-				newWebPush:''
+				newWebPush: ''
 			}
 		},
 
@@ -185,7 +185,7 @@ window.onload = function () {
 					this.updateUI(true)
 					//let token = result.credential.accessToken
 				}).catch(function (error) {
-					console.error(error)	
+					console.error(error)
 				});
 
 			},
@@ -423,10 +423,10 @@ window.onload = function () {
 			pickerDate(val) {
 				this.refDate = val
 			},
-			newNotif(val){
+			newNotif(val) {
 				this.notif_snackbar = true
 			},
-			newWebPush(val){
+			newWebPush(val) {
 				this.push_snackbar = true
 			},
 		}
