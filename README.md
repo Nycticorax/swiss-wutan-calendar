@@ -5,6 +5,6 @@
 * [x] Email notifications
 * [x] Organizing event in categories and letting users subscribe for receiving relevant notifications		
 * [-] Moving GCal & Firestore requests to Firebase Cloud Functions:
-  * [] GCal writes
+  * [x] GCal writes
   * [x] Firestore reads
   * [x] Firestore writes
