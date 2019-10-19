@@ -165,7 +165,7 @@
               </v-list-item>
               <v-list-item>
                 <v-list-item-content>
-                  <v-list-item-title>{{se.start.dateTime}}</v-list-item-title>
+                  <v-list-item-title>{{se.start.dateTime | filtreDates }}</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item>
@@ -228,7 +228,7 @@
       <v-container>
         <v-card>
           <v-toolbar id="gCal" flat color="red darken-2" dark>
-            <v-toolbar-title>Check the results</v-toolbar-title>
+            <v-toolbar-title>Check out the legacy Google Calendar</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
             <p>
@@ -273,6 +273,31 @@
             </div>
           </v-card>
         </v-card>
+      </v-container>
+      <!-- CARROUSEL -->
+      <v-container>
+        <v-card>
+          <v-toolbar id="carrou" flat color="red darken-2" dark>
+            <v-toolbar-title>Browse events</v-toolbar-title>
+          </v-toolbar>
+          <v-card-text>A more confortable way of flipping through new events.</v-card-text>
+        </v-card>
+        <v-carousel
+            cycle
+            height="400"
+            hide-delimiter-background
+            show-arrows-on-hover>
+          <v-carousel-item v-for="(e, i) in events" :key="i">
+            <v-sheet height="100%" tile :color="colors[i]">
+              <v-row class="fill-height" align="center" justify="center">
+                <div class="display-3">
+                  <p>{{e.summary}}</p>
+                  <p>{{e.start.dateTime | filtreDates }}</p>
+                </div>
+              </v-row>
+            </v-sheet>
+          </v-carousel-item>
+        </v-carousel>
       </v-container>
       <v-container>
         <!-- FORM -->
@@ -357,7 +382,7 @@
                       <li
                         v-for="e in thisMonthEvents"
                         :key="e.id"
-                      >{{ e.summary }}{{ e.start.dateTime }}</li>
+                      >{{ e.summary }}{{ e.start.dateTime | filtreDates }}</li>
                     </ul>
                     <br />
                     <br />
@@ -558,25 +583,25 @@
 </template>
 
 <script>
-const t0 = performance.now()
+const t0 = performance.now();
 
 // GOOGLE FIREBASE CLIENT CREDENTIALS
 const firebaseConfig = {
-	apiKey: "AIzaSyBn9ur32UG9DkmN74HYciXzcp7uoJ2hwuU",
-	authDomain: "main-repo.firebaseapp.com",
-	databaseURL: "https://main-repo.firebaseio.com",
-	projectId: "main-repo",
-	storageBucket: "main-repo.appspot.com",
-	messagingSenderId: "682912307930",
-	appId: "1:682912307930:web:065128b1ab322a66"
+  apiKey: "AIzaSyBn9ur32UG9DkmN74HYciXzcp7uoJ2hwuU",
+  authDomain: "main-repo.firebaseapp.com",
+  databaseURL: "https://main-repo.firebaseio.com",
+  projectId: "main-repo",
+  storageBucket: "main-repo.appspot.com",
+  messagingSenderId: "682912307930",
+  appId: "1:682912307930:web:065128b1ab322a66"
 };
 firebase.initializeApp(firebaseConfig);
 
 // FIRESTORE
-const db = firebase.firestore()
+const db = firebase.firestore();
 
 // GOOGLE FIREBASE MESSAGING
-const messaging = firebase.messaging()
+const messaging = firebase.messaging();
 
 export default {
   data() {
@@ -589,6 +614,7 @@ export default {
         { title: "Authentication", target: "#auth" },
         { title: "Manage events", target: "#manage" },
         { title: "Google Calendar", target: "#gCal" },
+        { title: "Event browser", target: "#carrou" },
         { title: "Submit new events", target: "#submit" },
         { title: "Subscribe to new events", target: "#subscribe" }
       ],
@@ -615,6 +641,7 @@ export default {
       rejecting: false,
       rejecting_why: "",
       iframe_key: 0,
+      colors: ["primary", "secondary", "yellow darken-2", "red", "orange"],
       valid: true,
       firstNameRules: [
         v => !!v || "Name is required",
@@ -861,22 +888,27 @@ export default {
         .then(response => {
           //console.log(response.result.items)
           return response.result.items.map(e => {
-            return {
+            let event = {
               local_id: Math.floor(Math.random() * Math.floor(1000)).toString(),
               validation_status: "accepted",
               summary: e.summary,
               description: e.description,
               location: e.location,
-              start: { dateTime: e.start.dateTime || '' },
-              end: { dateTime: e.end.dateTime || '' },
-              attachments: [{
-                fileUrl: attachments[0].fileUrl,
-                title: attachments[0].title,
-                mimeType: attachments[0].mimeType,
-                iconLink: attachments[0].iconLink,
-                fileId: attachments[0].fileId
-              }] || []
+              start: { dateTime: e.start.dateTime || "" },
+              end: { dateTime: e.end.dateTime || "" }
+            };
+            if ("attachments" in e) {
+              event.attachments = [
+                  {
+                    fileUrl: e.attachments[0].fileUrl || "",
+                    title: e.attachments[0].title || "",
+                    mimeType: e.attachments[0].mimeType || "",
+                    iconLink: e.attachments[0].iconLink || "",
+                    fileId: e.attachments[0].fileId || ""
+                  }
+                ];
             }
+            return event
           });
         });
     },
@@ -898,6 +930,7 @@ export default {
         "status",
         "updated",
         "gadget",
+        "attachments",
         "htmlLink",
         "summary",
         "description",
@@ -947,6 +980,10 @@ export default {
           console.error("This went wrong", err);
           this.newNotif = "Something went wrong. Please get in touch.";
         });
+    },
+
+    getAttachment(i){
+      return 'https://i.stack.imgur.com/tuXLP.png'//'attachments' in this.events[i] ? this.events[i]['attachments'][0]['fileUrl'] : ''
     },
 
     sendRejection() {
@@ -1079,7 +1116,7 @@ export default {
   },
   watch: {
     pickerDate(val) {
-      this.refDate = val;
+      this.refDate = val
     },
     newNotif(val) {
       this.notif_snackbar = true;
@@ -1087,6 +1124,16 @@ export default {
     newWebPush(val) {
       this.push_snackbar = true;
     }
+  },
+  filters: {
+    filtreDates(datetime) {
+      datetime = datetime.split('T')
+      let date = datetime[0], time = datetime[1]
+      let amj = date.split('-')
+      let a = amj[0], m = amj[1], j = amj[2]
+      let hhmm = time.slice(0,5)
+      return j + '.' + m + '.' + a + ' ' + hhmm
+    }
   }
-};
+}
 </script>
