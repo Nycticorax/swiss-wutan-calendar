@@ -859,6 +859,7 @@ export default {
           orderBy: "startTime"
         })
         .then(response => {
+          //console.log(response.result.items)
           return response.result.items.map(e => {
             return {
               local_id: Math.floor(Math.random() * Math.floor(1000)).toString(),
@@ -866,8 +867,15 @@ export default {
               summary: e.summary,
               description: e.description,
               location: e.location,
-              start: { dateTime: e.start.dateTime },
-              end: { dateTime: e.end.dateTime }
+              start: { dateTime: e.start.dateTime || '' },
+              end: { dateTime: e.end.dateTime || '' },
+              attachments: [{
+                fileUrl: attachments[0].fileUrl,
+                title: attachments[0].title,
+                mimeType: attachments[0].mimeType,
+                iconLink: attachments[0].iconLink,
+                fileId: attachments[0].fileId
+              }] || []
             }
           });
         });
@@ -889,6 +897,7 @@ export default {
       const gCalFields = [
         "status",
         "updated",
+        "gadget",
         "htmlLink",
         "summary",
         "description",
