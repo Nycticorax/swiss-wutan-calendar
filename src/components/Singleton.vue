@@ -288,7 +288,7 @@
             hide-delimiter-background
             show-arrows-on-hover>
           <v-carousel-item v-for="(e, i) in events" :key="i">
-            <v-sheet height="100%" tile :color="colors[i]">
+            <v-sheet height="100%" tile :color="colors[Math.floor(Math.random() * (5 - 0) + 0)]">
               <v-row class="fill-height" align="center" justify="center">
                 <div class="display-3">
                   <p>{{e.summary}}</p>
