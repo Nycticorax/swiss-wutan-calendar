@@ -1,6 +1,5 @@
 .DS_Store
 node_modules
-src
 babel.config.js
 package-lock.json
 package.json
