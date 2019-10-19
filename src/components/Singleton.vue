@@ -868,7 +868,7 @@ export default {
               location: e.location,
               start: { dateTime: e.start.dateTime },
               end: { dateTime: e.end.dateTime }
-            };
+            }
           });
         });
     },
