@@ -287,7 +287,7 @@
             height="400"
             hide-delimiter-background
             show-arrows-on-hover>
-          <v-carousel-item v-for="(e, i) in events" :key="i">
+          <v-carousel-item v-for="(e, i) in events" :key="i" :src="getAttachment(i)">
             <v-sheet height="100%" tile :color="colors[Math.floor(Math.random() * (5 - 0) + 0)]">
               <v-row class="fill-height" align="center" justify="center">
                 <div class="display-3">
@@ -983,7 +983,7 @@ export default {
     },
 
     getAttachment(i){
-      return 'https://i.stack.imgur.com/tuXLP.png'//'attachments' in this.events[i] ? this.events[i]['attachments'][0]['fileUrl'] : ''
+      return 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg'//'attachments' in this.events[i] ? this.events[i]['attachments'][0]['fileUrl'] : ''
     },
 
     sendRejection() {
