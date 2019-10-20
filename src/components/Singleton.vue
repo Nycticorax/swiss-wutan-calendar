@@ -287,12 +287,13 @@
             height="400"
             hide-delimiter-background
             show-arrows-on-hover>
-          <v-carousel-item v-for="(e, i) in events" :key="i" :src="getAttachment(i)">
+          <v-carousel-item v-for="(e, i) in events" :key="i">
             <v-sheet height="100%" tile :color="colors[Math.floor(Math.random() * (5 - 0) + 0)]">
               <v-row class="fill-height" align="center" justify="center">
                 <div class="display-3">
                   <p>{{e.summary}}</p>
                   <p>{{e.start.dateTime | filtreDates }}</p>
+                  <p>{{e.location}}</p>
                 </div>
               </v-row>
             </v-sheet>
@@ -983,7 +984,7 @@ export default {
     },
 
     getAttachment(i){
-      return 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg'//'attachments' in this.events[i] ? this.events[i]['attachments'][0]['fileUrl'] : ''
+      return 'attachments' in this.events[i] ? this.events[i]['attachments'][0]['fileUrl'] : ''
     },
 
     sendRejection() {
