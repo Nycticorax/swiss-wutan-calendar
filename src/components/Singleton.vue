@@ -594,7 +594,10 @@ const firebaseConfig = {
   projectId: "main-repo",
   storageBucket: "main-repo.appspot.com",
   messagingSenderId: "682912307930",
-  appId: "1:682912307930:web:065128b1ab322a66"
+  appId: "1:682912307930:web:065128b1ab322a66",
+  clientId: "682912307930-62gl7uo9mn743pphket25k7tf2buc3hc.apps.googleusercontent.com",
+  scope: "https://www.googleapis.com/auth/calendar",
+  discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"]
 };
 firebase.initializeApp(firebaseConfig);
 
@@ -797,10 +800,8 @@ export default {
 
     signIn() {
       const provider = new firebase.auth.GoogleAuthProvider();
-      provider.addScope("https://www.googleapis.com/auth/calendar");
-      firebase
-          .auth()
-          .signInWithPopup(provider)
+      //provider.addScope(firebaseConfig.scopes);
+      firebase.auth().signInWithPopup(provider)
       .then((result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
         this.updateUI(true);
@@ -862,30 +863,30 @@ export default {
       let vm = this;
       vm.api.client
         .init({
-          apiKey: "AIzaSyBzpFzhzVLPaQBH3r0WVv9Jg9dDJnM15Hw",
-          clientId:
-            "269173845983-bh57obunpvb47omgcbm6fq7nk3ube1mu.apps.googleusercontent.com",
-          discoveryDocs: [
-            "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
-          ],
-          scope: "https://www.googleapis.com/auth/calendar",
+          apiKey: firebaseConfig.apiKey,
+          clientId: firebaseConfig.clientId,
+          discoveryDocs: firebaseConfig.discoveryDocs,
+          scope: firebaseConfig.scope,
           calendar: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com"
         })
-        .then(_ => {
+        .then(() => {
           if (vm.api.auth2.getAuthInstance().isSignedIn.get()) {
-            return firebase.auth().currentUser.getIdToken().then(() => this.pullScheduled())
+            return this.pullScheduled().then(res => this.pulledEvents = res)
           } 
           else firebase.auth().signOut()
         })
-        .then(res => this.pulledEvents = res)
     },
-
+    /*
     gCalSignIn() {
       return Promise.resolve(this.api.auth2.getAuthInstance().signIn())
     },
 
     gCalSignOut() {
       return Promise.resolve(this.api.auth2.getAuthInstance().signOut())
+    },*/
+
+    gCalCheckToken(){
+        return firebase.auth().currentUser.getIdToken(true)
     },
 
     pullScheduled() {
@@ -975,40 +976,42 @@ export default {
             .update({ validation_status: "accepted" })
         )
       )
-        .then(() => {
-          //events.forEach(e => {
-            event = {summary: 'Google I/O 2015',
-                  location: '800 Howard St., San Francisco, CA 94103',
-                  description: 'A chance to hear more about Google\'s developer products.',
-                  start: {
-                    dateTime: '2019-10-30T09:00:00-07:00',
-                    timeZone: 'America/Los_Angeles'
-                  },
-                  end: {
-                    dateTime: '2019-10-30T17:00:00-07:00',
-                    timeZone: 'America/Los_Angeles'
-            }}
-            let r = vm.api.client.calendar.events.insert({
-              calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
-              resource: event                    
-            })
-            try {
-              r.execute(e => {
-                console.log('created this', )
-                this.updateUI(this.authorized);
-              });
-            } catch (err) {
-              console.log('This error occurred', err)
-            }
-          //});
-        })
-        .then(
-          () => (this.newNotif = nb_events.toString() + " event(s) accepted!")
-        )
-        .catch(err => {
-          console.error("This went wrong", err);
-          this.newNotif = "Something went wrong. Please get in touch.";
-        });
+      .then(() => {
+        this.gCalCheckToken()
+      })
+      .then(() => {//events.forEach(e => {
+          event = {summary: 'Google I/O 2015',
+                location: '800 Howard St., San Francisco, CA 94103',
+                description: 'A chance to hear more about Google\'s developer products.',
+                start: {
+                  dateTime: '2019-10-30T09:00:00-07:00',
+                  timeZone: 'America/Los_Angeles'
+                },
+                end: {
+                  dateTime: '2019-10-30T17:00:00-07:00',
+                  timeZone: 'America/Los_Angeles'
+          }}
+          let r = vm.api.client.calendar.events.insert({
+            calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
+            resource: event                    
+          })
+          try {
+            r.execute(e => {
+              console.log('created this', )
+              this.updateUI(this.authorized);
+            });
+          } catch (err) {
+            console.log('This error occurred', err)
+          }
+        //});
+      })
+      .then(
+        () => (this.newNotif = nb_events.toString() + " event(s) accepted!")
+      )
+      .catch(err => {
+        console.error("This went wrong", err);
+        this.newNotif = "Something went wrong. Please get in touch.";
+      });
     },
 
     getAttachment(i){
