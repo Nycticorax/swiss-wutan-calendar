@@ -729,6 +729,7 @@ export default {
 
   created() {
     this.api = gapi;
+    this.loadgCalClient();
     this.initMessaging();
     this.checkSignedIn();
   },
@@ -787,7 +788,6 @@ export default {
           this.user.gUserEmail = firebaseUser.email;
           this.user.name = firebaseUser.displayName;
           this.newNotif = "Hi again, " + this.user.name;
-          this.loadgCalClient()
           this.updateUI(true)
         } else {
           this.updateUI(false);
