@@ -977,7 +977,7 @@ export default {
         )
       )
       .then(() => {
-        this.gCalCheckToken()
+        return this.gCalCheckToken()
       })
       .then(() => {//events.forEach(e => {
           event = {summary: 'Google I/O 2015',
