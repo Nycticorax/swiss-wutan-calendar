@@ -729,7 +729,6 @@ export default {
 
   created() {
     this.api = gapi;
-    this.loadGapiClient();
     this.initMessaging();
     this.checkSignedIn();
   },
@@ -788,7 +787,8 @@ export default {
           this.user.gUserEmail = firebaseUser.email;
           this.user.name = firebaseUser.displayName;
           this.newNotif = "Hi again, " + this.user.name;
-          this.updateUI(true);
+          this.loadgCalClient()
+          this.updateUI(true)
         } else {
           this.updateUI(false);
         }
@@ -799,16 +799,16 @@ export default {
       const provider = new firebase.auth.GoogleAuthProvider();
       provider.addScope("https://www.googleapis.com/auth/calendar");
       firebase
-        .auth()
-        .signInWithPopup(provider)
-        .then(function(result) {
-          // This gives you a Google Access Token. You can use it to access the Google API.
-          this.updateUI(true);
-          //let token = result.credential.accessToken
-        })
-        .catch(function(error) {
-          console.error(error);
-        });
+          .auth()
+          .signInWithPopup(provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        this.updateUI(true);
+        //let token = result.credential.accessToken
+      })
+      .catch(function(error) {
+        console.error(error);
+      });
     },
 
     signOut() {
@@ -818,7 +818,7 @@ export default {
         .then(() => {
           console.log("User signed out");
           this.updateUI(false);
-        });
+        })
     },
 
     updateUI(is_authorized) {
@@ -854,11 +854,11 @@ export default {
       this.authorized = is_authorized;
     },
 
-    loadGapiClient() {
-      this.api.load("client:auth2", this.initClient);
+    loadgCalClient() {
+      this.api.load("client:auth2", this.gCalInitClient);
     },
 
-    initClient() {
+    gCalInitClient() {
       let vm = this;
       vm.api.client
         .init({
@@ -871,8 +871,21 @@ export default {
           scope: "https://www.googleapis.com/auth/calendar",
           calendar: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com"
         })
-        .then(_ => this.pullScheduled())
-        .then(res => (this.pulledEvents = res));
+        .then(_ => {
+          if (vm.api.auth2.getAuthInstance().isSignedIn.get()) {
+            return firebase.auth().currentUser.getIdToken().then(() => this.pullScheduled())
+          } 
+          else firebase.auth().signOut()
+        })
+        .then(res => this.pulledEvents = res)
+    },
+
+    gCalSignIn() {
+      return Promise.resolve(this.api.auth2.getAuthInstance().signIn())
+    },
+
+    gCalSignOut() {
+      return Promise.resolve(this.api.auth2.getAuthInstance().signOut())
     },
 
     pullScheduled() {
@@ -943,12 +956,12 @@ export default {
         "source",
         "reminders"
       ];
-      const sanitize = event => {
+      /*const sanitize = event => {
         for (let k in event) {
           if (!gCalFields.includes(k)) delete event[k];
         }
         return event;
-      };
+      }*/
       const events = this.selectedEvents.filter(
         e => e["validation_status"] === "submitted"
       );
@@ -963,16 +976,31 @@ export default {
         )
       )
         .then(() => {
-          events.forEach(e => {
+          //events.forEach(e => {
+            event = {'summary': 'Google I/O 2015',
+                  'location': '800 Howard St., San Francisco, CA 94103',
+                  'description': 'A chance to hear more about Google\'s developer products.',
+                  'start': {
+                    'dateTime': '2019-10-30T09:00:00-07:00',
+                    'timeZone': 'America/Los_Angeles'
+                  },
+                  'end': {
+                    'dateTime': '2019-10-30T17:00:00-07:00',
+                    'timeZone': 'America/Los_Angeles'
+            }}
             let r = vm.api.client.calendar.events.insert({
-              calendarId:
-                "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
-              resource: sanitize(e)
-            });
-            r.execute(() => {
-              this.updateUI(this.authorized);
-            });
-          });
+              calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
+              resource: event                    
+            })
+            try {
+              r.execute(e => {
+                console.log('created this', )
+                this.updateUI(this.authorized);
+              });
+            } catch (err) {
+              console.log('This error occurred', err)
+            }
+          //});
         })
         .then(
           () => (this.newNotif = nb_events.toString() + " event(s) accepted!")
