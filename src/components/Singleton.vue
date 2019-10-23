@@ -263,7 +263,7 @@
           <v-card class="d-flex pa-2" outlined tile>
             <div :key="iframe_key">
               <iframe
-                src="https://calendar.google.com/calendar/embed?height=450&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=M21vMGE2MzlxZmhzOXRqYzFpZG11NGtrdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=1&amp;showNav=1&amp;showPrint=0&amp;showTabs=0&amp;showCalendars=0&amp;showTz=0&amp;mode=AGENDA&amp;hl=de"
+                src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=bmthNmVuOHBpYW80bDk0aDNuamRsNWUwOTBAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23A79B8E&amp;showTz=0&amp;showCalendars=0&amp;showTabs=0&amp;showPrint=0&amp;hl=de&amp;showNav=0&amp;showTitle=0&amp;mode=AGENDA"
                 style="border-width:0"
                 width="450"
                 height="450"
@@ -869,7 +869,7 @@ export default {
           clientId: firebaseConfig.clientId,
           discoveryDocs: firebaseConfig.discoveryDocs,
           scope: firebaseConfig.scope,
-          calendar: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com"
+          calendar: "nka6en8piao4l94h3njdl5e090@group.calendar.google.com"
         })
         .then(() => {
           if (vm.api.auth2.getAuthInstance().isSignedIn.get()) {
@@ -894,7 +894,7 @@ export default {
       let vm = this;
       return vm.api.client.calendar.events
         .list({
-          calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
+          calendarId: "nka6en8piao4l94h3njdl5e090@group.calendar.google.com",
           timeMin: new Date().toISOString(),
           showDeleted: false,
           singleEvents: true,
