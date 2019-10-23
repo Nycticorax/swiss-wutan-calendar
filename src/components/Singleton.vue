@@ -977,16 +977,16 @@ export default {
       )
         .then(() => {
           //events.forEach(e => {
-            event = {'summary': 'Google I/O 2015',
-                  'location': '800 Howard St., San Francisco, CA 94103',
-                  'description': 'A chance to hear more about Google\'s developer products.',
-                  'start': {
-                    'dateTime': '2019-10-30T09:00:00-07:00',
-                    'timeZone': 'America/Los_Angeles'
+            event = {summary: 'Google I/O 2015',
+                  location: '800 Howard St., San Francisco, CA 94103',
+                  description: 'A chance to hear more about Google\'s developer products.',
+                  start: {
+                    dateTime: '2019-10-30T09:00:00-07:00',
+                    timeZone: 'America/Los_Angeles'
                   },
-                  'end': {
-                    'dateTime': '2019-10-30T17:00:00-07:00',
-                    'timeZone': 'America/Los_Angeles'
+                  end: {
+                    dateTime: '2019-10-30T17:00:00-07:00',
+                    timeZone: 'America/Los_Angeles'
             }}
             let r = vm.api.client.calendar.events.insert({
               calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
