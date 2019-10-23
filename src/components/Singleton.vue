@@ -282,11 +282,7 @@
           </v-toolbar>
           <v-card-text>A more confortable way of flipping through new events.</v-card-text>
         </v-card>
-        <v-carousel
-            cycle
-            height="400"
-            hide-delimiter-background
-            show-arrows-on-hover>
+        <v-carousel cycle height="400" hide-delimiter-background show-arrows-on-hover>
           <v-carousel-item v-for="(e, i) in events" :key="i">
             <v-sheet height="100%" tile :color="colors[Math.floor(Math.random() * (5 - 0) + 0)]">
               <v-row class="fill-height" align="center" justify="center">
@@ -595,9 +591,12 @@ const firebaseConfig = {
   storageBucket: "main-repo.appspot.com",
   messagingSenderId: "682912307930",
   appId: "1:682912307930:web:065128b1ab322a66",
-  clientId: "682912307930-62gl7uo9mn743pphket25k7tf2buc3hc.apps.googleusercontent.com",
+  clientId:
+    "682912307930-62gl7uo9mn743pphket25k7tf2buc3hc.apps.googleusercontent.com",
   scope: "https://www.googleapis.com/auth/calendar",
-  discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"]
+  discoveryDocs: [
+    "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
+  ]
 };
 firebase.initializeApp(firebaseConfig);
 
@@ -791,7 +790,7 @@ export default {
           this.user.gUserEmail = firebaseUser.email;
           this.user.name = firebaseUser.displayName;
           this.newNotif = "Hi again, " + this.user.name;
-          this.updateUI(true)
+          this.updateUI(true);
         } else {
           this.updateUI(false);
         }
@@ -801,15 +800,17 @@ export default {
     signIn() {
       const provider = new firebase.auth.GoogleAuthProvider();
       //provider.addScope(firebaseConfig.scopes);
-      firebase.auth().signInWithPopup(provider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        this.updateUI(true);
-        //let token = result.credential.accessToken
-      })
-      .catch(function(error) {
-        console.error(error);
-      });
+      firebase
+        .auth()
+        .signInWithPopup(provider)
+        .then(result => {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          this.updateUI(true);
+          //let token = result.credential.accessToken
+        })
+        .catch(function(error) {
+          console.error(error);
+        });
     },
 
     signOut() {
@@ -819,7 +820,7 @@ export default {
         .then(() => {
           console.log("User signed out");
           this.updateUI(false);
-        })
+        });
     },
 
     updateUI(is_authorized) {
@@ -856,7 +857,8 @@ export default {
     },
 
     loadgCalClient() {
-      this.api.load("client:auth2", this.gCalInitClient);
+      let vm = this;
+      vm.api.load("client:auth2", this.gCalInitClient);
     },
 
     gCalInitClient() {
@@ -871,10 +873,9 @@ export default {
         })
         .then(() => {
           if (vm.api.auth2.getAuthInstance().isSignedIn.get()) {
-            return this.pullScheduled().then(res => this.pulledEvents = res)
-          } 
-          else firebase.auth().signOut()
-        })
+            return this.pullScheduled().then(res => (this.pulledEvents = res));
+          } else firebase.auth().signOut();
+        });
     },
     /*
     gCalSignIn() {
@@ -885,8 +886,8 @@ export default {
       return Promise.resolve(this.api.auth2.getAuthInstance().signOut())
     },*/
 
-    gCalCheckToken(){
-        return firebase.auth().currentUser.getIdToken(true)
+    gCalCheckToken() {
+      return firebase.auth().currentUser.getIdToken(true);
     },
 
     pullScheduled() {
@@ -914,16 +915,16 @@ export default {
             };
             if ("attachments" in e) {
               event.attachments = [
-                  {
-                    fileUrl: e.attachments[0].fileUrl || "",
-                    title: e.attachments[0].title || "",
-                    mimeType: e.attachments[0].mimeType || "",
-                    iconLink: e.attachments[0].iconLink || "",
-                    fileId: e.attachments[0].fileId || ""
-                  }
-                ];
+                {
+                  fileUrl: e.attachments[0].fileUrl || "",
+                  title: e.attachments[0].title || "",
+                  mimeType: e.attachments[0].mimeType || "",
+                  iconLink: e.attachments[0].iconLink || "",
+                  fileId: e.attachments[0].fileId || ""
+                }
+              ];
             }
-            return event
+            return event;
           });
         });
     },
@@ -976,46 +977,52 @@ export default {
             .update({ validation_status: "accepted" })
         )
       )
-      .then(() => {
-        return this.gCalCheckToken()
-      })
-      .then(() => {//events.forEach(e => {
-          event = {summary: 'Google I/O 2015',
-                location: '800 Howard St., San Francisco, CA 94103',
-                description: 'A chance to hear more about Google\'s developer products.',
-                start: {
-                  dateTime: '2019-10-30T09:00:00-07:00',
-                  timeZone: 'America/Los_Angeles'
-                },
-                end: {
-                  dateTime: '2019-10-30T17:00:00-07:00',
-                  timeZone: 'America/Los_Angeles'
-          }}
+        .then(() => {
+          return this.gCalCheckToken();
+        })
+        .then(() => {
+          //events.forEach(e => {
+          event = {
+            summary: "Google I/O 2015",
+            location: "800 Howard St., San Francisco, CA 94103",
+            description:
+              "A chance to hear more about Google's developer products.",
+            start: {
+              dateTime: "2019-10-30T09:00:00-07:00",
+              timeZone: "America/Los_Angeles"
+            },
+            end: {
+              dateTime: "2019-10-30T17:00:00-07:00",
+              timeZone: "America/Los_Angeles"
+            }
+          };
           let r = vm.api.client.calendar.events.insert({
             calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
-            resource: event                    
-          })
+            resource: event
+          });
           try {
             r.execute(e => {
-              console.log('created this', )
+              console.log("created this");
               this.updateUI(this.authorized);
             });
           } catch (err) {
-            console.log('This error occurred', err)
+            console.log("This error occurred", err);
           }
-        //});
-      })
-      .then(
-        () => (this.newNotif = nb_events.toString() + " event(s) accepted!")
-      )
-      .catch(err => {
-        console.error("This went wrong", err);
-        this.newNotif = "Something went wrong. Please get in touch.";
-      });
+          //});
+        })
+        .then(
+          () => (this.newNotif = nb_events.toString() + " event(s) accepted!")
+        )
+        .catch(err => {
+          console.error("This went wrong", err);
+          this.newNotif = "Something went wrong. Please get in touch.";
+        });
     },
 
-    getAttachment(i){
-      return 'attachments' in this.events[i] ? this.events[i]['attachments'][0]['fileUrl'] : ''
+    getAttachment(i) {
+      return "attachments" in this.events[i]
+        ? this.events[i]["attachments"][0]["fileUrl"]
+        : "";
     },
 
     sendRejection() {
@@ -1148,7 +1155,7 @@ export default {
   },
   watch: {
     pickerDate(val) {
-      this.refDate = val
+      this.refDate = val;
     },
     newNotif(val) {
       this.notif_snackbar = true;
@@ -1159,13 +1166,16 @@ export default {
   },
   filters: {
     filtreDates(datetime) {
-      datetime = datetime.split('T')
-      let date = datetime[0], time = datetime[1]
-      let amj = date.split('-')
-      let a = amj[0], m = amj[1], j = amj[2]
-      let hhmm = time.slice(0,5)
-      return j + '.' + m + '.' + a + ' ' + hhmm
+      datetime = datetime.split("T");
+      let date = datetime[0],
+        time = datetime[1];
+      let amj = date.split("-");
+      let a = amj[0],
+        m = amj[1],
+        j = amj[2];
+      let hhmm = time.slice(0, 5);
+      return j + "." + m + "." + a + " " + hhmm;
     }
   }
-}
+};
 </script>
