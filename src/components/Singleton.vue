@@ -826,7 +826,7 @@ export default {
       firebase.auth().signInWithPopup(provider).then(result => {
           // This gives you a Google Access Token. You can use it to access the Google API.
           let token = result.credential.accessToken
-          vm.api.client.setToken({accessToken:token}) 
+          vm.api.client.setToken({access_token:token}) 
           this.updateUI(true);
         })
         .catch(function(error) {
