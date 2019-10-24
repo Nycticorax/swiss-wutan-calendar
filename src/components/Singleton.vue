@@ -231,37 +231,14 @@
             <v-toolbar-title>Check out the legacy Google Calendar</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
-            <p>
-              This is NOT the actual calendar used to review and submit events (see below for the real
-              calendar). This is just the "official" interface Google provides for interacting with
-              events. I am putting it here simply to show that accepting submitted events works. By
-              the way it is visible by
+             This is the "official" interface Google provides for interacting with
+              events. It is visible by
               anyone on
-              the internet -- no credentials required. Here's its
-              <a
-                href="https://calendar.google.com/calendar/embed?src=3mo0a639qfhs9tjc1idmu4kkus%40group.calendar.google.com&ctz=Europe%2FZurich"
-              >
-                home
-                page
-              </a>. Also, remember that Google Calendars have many
-              features:
-            </p>
-            <ol>
-              <li>can share links to expose any calendar</li>
-              <li>can link up any two calendars, so that can explose each other's events</li>
-              <li>custom email & push notifications.</li>
-              <li>
-                available on many different platforms --
-                Web, Android, iPhone
-              </li>
-            </ol>
-            <p>
-              If you have accepted events submissions you can now hit
-              <v-btn @click="refreshFrame">reload</v-btn>to see the results of the newly validated events.
-            </p>
+              the internet -- no credentials required. Events which are accepted using the form just above will show up there. Also, remember that Google Calendars have many
+              features (independently of this very web app). The point of this web app is to provide a more fine-grained control over what gets in the Google Calendar, and to offer a better user interface.
           </v-card-text>
           <v-card class="d-flex pa-2" outlined tile>
-            <!-- <div :key="iframe_key">
+            <div :key="iframe_key">
               <iframe
                 src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=bmthNmVuOHBpYW80bDk0aDNuamRsNWUwOTBAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23A79B8E&amp;showTz=0&amp;showCalendars=0&amp;showTabs=0&amp;showPrint=0&amp;hl=de&amp;showNav=0&amp;showTitle=0&amp;mode=AGENDA"
                 style="border-width:0"
@@ -270,7 +247,7 @@
                 frameborder="0"
                 scrolling="no"
               ></iframe>
-            </div> -->
+            </div>
           </v-card>
         </v-card>
       </v-container>
