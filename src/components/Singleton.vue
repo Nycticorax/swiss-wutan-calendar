@@ -822,11 +822,10 @@ export default {
     signIn() {
       let vm = this
       const provider = new firebase.auth.GoogleAuthProvider();
-      provider.addScope("https://www.googleapis.com/auth/calendar");
+      //provider.addScope("https://www.googleapis.com/auth/calendar");
       firebase.auth().signInWithPopup(provider).then(result => {
           // This gives you a Google Access Token. You can use it to access the Google API.
           let token = result.credential.accessToken
-          console.log(token)
           vm.api.client.setToken({accessToken:token}) 
           this.updateUI(true);
         })
@@ -894,9 +893,9 @@ export default {
           calendar: "nka6en8piao4l94h3njdl5e090@group.calendar.google.com"
         })
         .then(() => {
-          if (vm.api.auth2.getAuthInstance().isSignedIn.get()) {
+          //if (vm.api.auth2.getAuthInstance().isSignedIn.get()) {
             return this.pullScheduled().then(res => (this.pulledEvents = res));
-          } else firebase.auth().signOut();
+          //} else firebase.auth().signOut();
         });
     },
     /*
