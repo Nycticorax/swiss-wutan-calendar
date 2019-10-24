@@ -590,13 +590,7 @@ const firebaseConfig = {
   projectId: "main-repo",
   storageBucket: "main-repo.appspot.com",
   messagingSenderId: "682912307930",
-  appId: "1:682912307930:web:065128b1ab322a66",
-  clientId:
-    "682912307930-62gl7uo9mn743pphket25k7tf2buc3hc.apps.googleusercontent.com",
-  scope: "https://www.googleapis.com/auth/calendar",
-  discoveryDocs: [
-    "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
-  ]
+  appId: "1:682912307930:web:065128b1ab322a66"
 };
 firebase.initializeApp(firebaseConfig);
 
@@ -755,6 +749,34 @@ export default {
   },
 
   methods: {
+
+    /*testNewEvent(){
+      console.log('trying to write a new event now')
+      const vm = this
+      event = {
+              summary: "Google I/O 2015",
+              location: "800 Howard St., San Francisco, CA 94103",
+              description:
+                "A chance to hear more about Google's developer products.",
+              start: {
+                dateTime: "2019-10-30T09:00:00-07:00",
+                timeZone: "America/Los_Angeles"
+              },
+              end: {
+                dateTime: "2019-10-30T17:00:00-07:00",
+                timeZone: "America/Los_Angeles"
+              }
+            };
+            let r = vm.api.client.calendar.events.insert({
+              calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
+              resource: event
+            });
+            r.execute(e => {
+              console.log('writing...')
+              this.updateUI(this.authorized);
+        })
+    },*/
+
     initMessaging() {
       messaging.usePublicVapidKey(
         "BJV_rKOrznrxId6JaxqYzlt7HcHjCK-c5S4062SL-dCqDtDkFs5fxifKdAtSyy3OIovPzhRC_O33reZbzBa1O6E"
@@ -798,15 +820,15 @@ export default {
     },
 
     signIn() {
+      let vm = this
       const provider = new firebase.auth.GoogleAuthProvider();
-      //provider.addScope(firebaseConfig.scopes);
-      firebase
-        .auth()
-        .signInWithPopup(provider)
-        .then(result => {
+      provider.addScope("https://www.googleapis.com/auth/calendar");
+      firebase.auth().signInWithPopup(provider).then(result => {
           // This gives you a Google Access Token. You can use it to access the Google API.
+          let token = result.credential.accessToken
+          console.log(token)
+          vm.api.client.setToken({accessToken:token}) 
           this.updateUI(true);
-          //let token = result.credential.accessToken
         })
         .catch(function(error) {
           console.error(error);
@@ -866,9 +888,9 @@ export default {
       vm.api.client
         .init({
           apiKey: firebaseConfig.apiKey,
-          clientId: firebaseConfig.clientId,
-          discoveryDocs: firebaseConfig.discoveryDocs,
-          scope: firebaseConfig.scope,
+          clientId: "682912307930-62gl7uo9mn743pphket25k7tf2buc3hc.apps.googleusercontent.com",
+          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+          scope: "https://www.googleapis.com/auth/calendar",
           calendar: "nka6en8piao4l94h3njdl5e090@group.calendar.google.com"
         })
         .then(() => {
@@ -926,7 +948,7 @@ export default {
             }
             return event;
           });
-        });
+        })
     },
 
     // Pull submitted events from firestore
