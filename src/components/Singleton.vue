@@ -784,12 +784,16 @@ export default {
     },
 
     checkSignedIn() {
+      let vm = this
       firebase.auth().onAuthStateChanged(firebaseUser => {
         if (firebaseUser) {
           this.user.gUserEmail = firebaseUser.email;
           this.user.name = firebaseUser.displayName;
           this.newNotif = "Hi again, " + this.user.name;
-          this.updateUI(true);
+          firebaseUser.getIdToken().then(token => {
+            vm.api.client.setToken({access_token: token})
+            this.updateUI(true);
+          })
         } else {
           this.updateUI(false);
         }
@@ -802,8 +806,8 @@ export default {
       //provider.addScope("https://www.googleapis.com/auth/calendar");
       firebase.auth().signInWithPopup(provider).then(result => {
           // This gives you a Google Access Token. You can use it to access the Google API.
-          let token = result.credential.accessToken
-          vm.api.client.setToken({access_token:token}) 
+          // let token = result.credential.accessToken
+          // vm.api.client.setToken({access_token:token}) 
           this.updateUI(true);
         })
         .catch(function(error) {
