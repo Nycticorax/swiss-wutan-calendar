@@ -261,7 +261,7 @@
             </p>
           </v-card-text>
           <v-card class="d-flex pa-2" outlined tile>
-            <div :key="iframe_key">
+            <!-- <div :key="iframe_key">
               <iframe
                 src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=bmthNmVuOHBpYW80bDk0aDNuamRsNWUwOTBAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23A79B8E&amp;showTz=0&amp;showCalendars=0&amp;showTabs=0&amp;showPrint=0&amp;hl=de&amp;showNav=0&amp;showTitle=0&amp;mode=AGENDA"
                 style="border-width:0"
@@ -270,7 +270,7 @@
                 frameborder="0"
                 scrolling="no"
               ></iframe>
-            </div>
+            </div> -->
           </v-card>
         </v-card>
       </v-container>
