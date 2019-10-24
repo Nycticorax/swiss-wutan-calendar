@@ -855,8 +855,7 @@ export default {
     },
 
     loadgCalClient() {
-      let vm = this;
-      vm.api.load("client:auth2", this.gCalInitClient);
+      this.api.load("client:auth2", this.gCalInitClient);
     },
 
     gCalInitClient() {
