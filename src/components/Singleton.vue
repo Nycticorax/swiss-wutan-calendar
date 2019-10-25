@@ -35,7 +35,7 @@
             <p>
               The goal of this page is to demo a workable, in-house
               alternative to Facebook for managing Swiss Wutan's events. Reasons to go all-in with
-              Facebook are (a) Facebook is the ultimate owner of the content it hosts; (b) Facebook
+              Facebook are (a) Facebook is the ultimate owner of the content it hosts (b) Facebook
               has a
               poor record in protecting users' privacy, (c) Facebook is extremely opaque and has poor
               programming interfaces and finally (d) it's always good not to put all one's eggs in the
@@ -231,16 +231,16 @@
             <v-toolbar-title>Check out the legacy Google Calendar</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
-             This is the "official" interface Google provides for interacting with
-              events. It is visible by
-              anyone on
-              the internet -- no credentials required. Events which are accepted using the form just above will show up there. Also, remember that Google Calendars have many
-              features (independently of this very web app). The point of this web app is to provide a more fine-grained control over what gets in the Google Calendar, and to offer a better user interface.
+            This is the "official" interface Google provides for interacting with
+            events. It is visible by
+            anyone on
+            the internet -- no credentials required. Events which are accepted using the form just above will show up there. Also, remember that Google Calendars have many
+            features (independently of this very web app). The point of this web app is to provide a more fine-grained control over what gets in the Google Calendar, and to offer a better user interface.
           </v-card-text>
           <v-card class="d-flex pa-2" outlined tile>
             <div :key="iframe_key">
               <iframe
-                src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=bmthNmVuOHBpYW80bDk0aDNuamRsNWUwOTBAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23A79B8E&amp;showTz=0&amp;showCalendars=0&amp;showTabs=0&amp;showPrint=0&amp;hl=de&amp;showNav=0&amp;showTitle=0&amp;mode=AGENDA"
+                src="https://calendar.google.com/calendar/embed?height=600&ampwkst=2&ampbgcolor=%23D50000&ampctz=Europe%2FZurich&ampsrc=bmthNmVuOHBpYW80bDk0aDNuamRsNWUwOTBAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&ampcolor=%23A79B8E&ampshowTz=0&ampshowCalendars=0&ampshowTabs=0&ampshowPrint=0&amphl=de&ampshowNav=0&ampshowTitle=0&ampmode=AGENDA"
                 style="border-width:0"
                 width="450"
                 height="450"
@@ -567,8 +567,15 @@ const firebaseConfig = {
   projectId: "main-repo",
   storageBucket: "main-repo.appspot.com",
   messagingSenderId: "682912307930",
-  appId: "1:682912307930:web:065128b1ab322a66"
+  appId: "1:682912307930:web:065128b1ab322a66",
+  clientId:
+    "682912307930-62gl7uo9mn743pphket25k7tf2buc3hc.apps.googleusercontent.com",
+  discoveryDocs: [
+    "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
+  ],
+  scopes: ["email", "profile", "https://www.googleapis.com/auth/calendar"]
 };
+
 firebase.initializeApp(firebaseConfig);
 
 // FIRESTORE
@@ -701,10 +708,9 @@ export default {
   },
 
   created() {
-    this.api = gapi;
-    this.loadgCalClient();
     this.initMessaging();
-    this.checkSignedIn();
+    this.api = gapi;
+    this.listenAndLoad();
   },
 
   mounted() {
@@ -726,34 +732,56 @@ export default {
   },
 
   methods: {
+    signIn() {
+      let provider = new firebase.auth.GoogleAuthProvider();
+      provider.addScope("profile");
+      provider.addScope("email");
+      provider.addScope("https://www.googleapis.com/auth/calendar");
+      firebase
+        .auth()
+        .signInWithPopup(provider)
+        .then(result => {})
+        .catch(error => {
+          // Handle Errors here.
+        });
+    },
 
-    /*testNewEvent(){
-      console.log('trying to write a new event now')
-      const vm = this
-      event = {
-              summary: "Google I/O 2015",
-              location: "800 Howard St., San Francisco, CA 94103",
-              description:
-                "A chance to hear more about Google's developer products.",
-              start: {
-                dateTime: "2019-10-30T09:00:00-07:00",
-                timeZone: "America/Los_Angeles"
-              },
-              end: {
-                dateTime: "2019-10-30T17:00:00-07:00",
-                timeZone: "America/Los_Angeles"
-              }
-            };
-            let r = vm.api.client.calendar.events.insert({
-              calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
-              resource: event
-            });
-            r.execute(e => {
-              console.log('writing...')
-              this.updateUI(this.authorized);
+    listenAndLoad() {
+      firebase.auth().onAuthStateChanged(firebaseUser => {
+        // Make sure there is a valid user object
+        this.authorized = firebaseUser ? true : false;
+        if (this.authorized) {
+          this.user.gUserEmail = firebaseUser.email;
+          this.user.name = firebaseUser.displayName;
+          this.newNotif = "Hi again, " + this.user.name;
+        }
+        this.loadGapiClient()
+      })
+    },
+
+    loadGapiClient() {
+      this.api.load('client:auth2', this.initClient);
+    },
+
+    initClient(){
+        let vm = this
+        vm.api.client.init({
+            apiKey: firebaseConfig.apiKey,
+            clientId: firebaseConfig.clientId,
+            discoveryDocs: firebaseConfig.discoveryDocs,
+            scope: firebaseConfig.scopes.join(" ")
+      })
+      .then(() => {
+        console.log('went so far')
+        firebase.auth().currentUser.getIdToken()
+        this.pullScheduled().then(events => {
+            this.pulledEvents = events;
+            if (this.authorized) this.updateUI(true);
+            else this.updateUI(false);
         })
-    },*/
-
+      })
+    },
+          
     initMessaging() {
       messaging.usePublicVapidKey(
         "BJV_rKOrznrxId6JaxqYzlt7HcHjCK-c5S4062SL-dCqDtDkFs5fxifKdAtSyy3OIovPzhRC_O33reZbzBa1O6E"
@@ -784,42 +812,13 @@ export default {
     },
 
     checkSignedIn() {
-      let vm = this
+      let vm = this;
       firebase.auth().onAuthStateChanged(firebaseUser => {
         if (firebaseUser) {
-          this.user.gUserEmail = firebaseUser.email;
-          this.user.name = firebaseUser.displayName;
-          this.newNotif = "Hi again, " + this.user.name;
-          this.updateUI(true)
         } else {
-          this.updateUI(false)
+          this.updateUI(false);
         }
       });
-    },
-
-    signIn() {
-      let vm = this
-      const provider = new firebase.auth.GoogleAuthProvider();
-      //provider.addScope("https://www.googleapis.com/auth/calendar");
-      firebase.auth().signInWithPopup(provider).then(result => {
-          // This gives you a Google Access Token. You can use it to access the Google API.
-          // let token = result.credential.accessToken
-          // vm.api.client.setToken({access_token:token.toString()}) 
-          this.updateUI(true);
-        })
-        .catch(function(error) {
-          console.error(error);
-        });
-    },
-
-    signOut() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          console.log("User signed out");
-          this.updateUI(false);
-        });
     },
 
     updateUI(is_authorized) {
@@ -855,39 +854,8 @@ export default {
       this.authorized = is_authorized;
     },
 
-    loadgCalClient() {
-      this.api.load("client:auth2", this.gCalInitClient);
-    },
-
-    gCalInitClient() {
-      let vm = this;
-      vm.api.client
-        .init({
-          apiKey: firebaseConfig.apiKey,
-          clientId: "682912307930-62gl7uo9mn743pphket25k7tf2buc3hc.apps.googleusercontent.com",
-          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-          scope: "https://www.googleapis.com/auth/calendar",
-          calendar: "nka6en8piao4l94h3njdl5e090@group.calendar.google.com"
-        })
-        .then(() => {
-          return this.pullScheduled().then(res => (this.pulledEvents = res));
-        });
-    },
-    /*
-    gCalSignIn() {
-      return Promise.resolve(this.api.auth2.getAuthInstance().signIn())
-    },
-
-    gCalSignOut() {
-      return Promise.resolve(this.api.auth2.getAuthInstance().signOut())
-    },
-
-    gCalCheckToken() {
-      return firebase.auth().currentUser.getIdToken(true);
-    },
-    */
     pullScheduled() {
-      let vm = this;
+      const vm = this;
       return vm.api.client.calendar.events
         .list({
           calendarId: "nka6en8piao4l94h3njdl5e090@group.calendar.google.com",
@@ -922,7 +890,7 @@ export default {
             }
             return event;
           });
-        })
+        });
     },
 
     // Pull submitted events from firestore
@@ -937,7 +905,6 @@ export default {
 
     // Accept or reject events
     acceptSubmitted() {
-      const vm = this;
       const gCalFields = [
         "status",
         "updated",
@@ -956,9 +923,9 @@ export default {
       ];
       /*const sanitize = event => {
         for (let k in event) {
-          if (!gCalFields.includes(k)) delete event[k];
+          if (!gCalFields.includes(k)) delete event[k]
         }
-        return event;
+        return event
       }*/
       const events = this.selectedEvents.filter(
         e => e["validation_status"] === "submitted"
@@ -992,7 +959,7 @@ export default {
               timeZone: "America/Los_Angeles"
             }
           };
-          let r = vm.api.client.calendar.events.insert({
+          let r = gapi.client.calendar.events.insert({
             calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
             resource: event
           });
@@ -1004,7 +971,7 @@ export default {
           } catch (err) {
             console.log("This error occurred", err);
           }
-          //});
+          //})
         })
         .then(
           () => (this.newNotif = nb_events.toString() + " event(s) accepted!")
