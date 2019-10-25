@@ -755,32 +755,33 @@ export default {
           this.user.name = firebaseUser.displayName;
           this.newNotif = "Hi again, " + this.user.name;
         }
-        this.loadGapiClient()
-      })
+        this.loadGapiClient();
+      });
     },
 
     loadGapiClient() {
-      this.api.load('client:auth2', this.initClient);
+      this.api.load("client:auth2", this.initClient);
     },
 
-    initClient(){
-        let vm = this
-        vm.api.client.init({
-            apiKey: firebaseConfig.apiKey,
-            clientId: firebaseConfig.clientId,
-            discoveryDocs: firebaseConfig.discoveryDocs,
-            scope: firebaseConfig.scopes.join(" ")
-      })
-      .then(() => {
-        firebase.auth().currentUser.getIdToken()
-        this.pullScheduled().then(events => {
+    initClient() {
+      let vm = this;
+      vm.api.client
+        .init({
+          apiKey: firebaseConfig.apiKey,
+          clientId: firebaseConfig.clientId,
+          discoveryDocs: firebaseConfig.discoveryDocs,
+          scope: firebaseConfig.scopes.join(" ")
+        })
+        .then(() => {
+          firebase.auth().currentUser.getIdToken();
+          this.pullScheduled().then(events => {
             this.pulledEvents = events;
             if (this.authorized) this.updateUI(true);
             else this.updateUI(false);
-        })
-      })
+          });
+        });
     },
-          
+
     initMessaging() {
       messaging.usePublicVapidKey(
         "BJV_rKOrznrxId6JaxqYzlt7HcHjCK-c5S4062SL-dCqDtDkFs5fxifKdAtSyy3OIovPzhRC_O33reZbzBa1O6E"
