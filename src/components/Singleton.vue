@@ -790,12 +790,9 @@ export default {
           this.user.gUserEmail = firebaseUser.email;
           this.user.name = firebaseUser.displayName;
           this.newNotif = "Hi again, " + this.user.name;
-          firebaseUser.getIdToken().then(token => {
-            vm.api.client.setToken({access_token: token})
-            this.updateUI(true);
-          })
+          this.updateUI(true)
         } else {
-          this.updateUI(false);
+          this.updateUI(false)
         }
       });
     },
@@ -873,9 +870,7 @@ export default {
           calendar: "nka6en8piao4l94h3njdl5e090@group.calendar.google.com"
         })
         .then(() => {
-          //if (vm.api.auth2.getAuthInstance().isSignedIn.get()) {
-            return this.pullScheduled().then(res => (this.pulledEvents = res));
-          //} else firebase.auth().signOut();
+          return this.pullScheduled().then(res => (this.pulledEvents = res));
         });
     },
     /*
@@ -885,12 +880,12 @@ export default {
 
     gCalSignOut() {
       return Promise.resolve(this.api.auth2.getAuthInstance().signOut())
-    },*/
+    },
 
     gCalCheckToken() {
       return firebase.auth().currentUser.getIdToken(true);
     },
-
+    */
     pullScheduled() {
       let vm = this;
       return vm.api.client.calendar.events
