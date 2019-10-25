@@ -772,7 +772,6 @@ export default {
             scope: firebaseConfig.scopes.join(" ")
       })
       .then(() => {
-        console.log('went so far')
         firebase.auth().currentUser.getIdToken()
         this.pullScheduled().then(events => {
             this.pulledEvents = events;
