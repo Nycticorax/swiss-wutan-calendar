@@ -950,7 +950,7 @@ export default {
             }
           }
           let r = gapi.client.calendar.events.insert({
-            calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
+            calendarId: "nka6en8piao4l94h3njdl5e090@group.calendar.google.com",
             resource: event
           })
           try {
