@@ -805,7 +805,6 @@ export default {
             this.pulledEvents = events
             if (this.authorized) this.updateUI(true)
             else this.updateUI(false)
-            console.log(JSON.stringify(gapi.auth2.getAuthInstance().isSignedIn.get()))
           })
         })
     },
@@ -824,7 +823,7 @@ export default {
               userRef.set({
                 email: this.user.gUserEmail,
                 created_on: firebase.firestore.FieldValue.serverTimestamp()
-              })
+            })
             else {
               this.user.notifs_prefs = doc.data().notifs_prefs || []
               this.user.token = doc.data().token || ""
@@ -930,6 +929,7 @@ export default {
         )
       )
         .then(() => {
+          if (!gapi.auth2.getAuthInstance().isSignedIn.get()) { console.error('tried to push events, but not signed in!'); return}
           //events.forEach(e => {
           event = {
             summary: "Google I/O 2015",
