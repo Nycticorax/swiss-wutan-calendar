@@ -590,6 +590,7 @@ export default {
       // operational stuff
       api: undefined,
       authorized: false,
+      accessToken: '',
       navItems: [
         { title: "Introduction", target: "#intro" },
         { title: "Authentication", target: "#auth" },
@@ -769,7 +770,7 @@ export default {
       firebase
         .auth()
         .signInWithPopup(provider)
-        .then(result => {})
+        .then(result => this.accessToken = result.credential.accessToken)
         .catch(err => console.error(error))
     },
 
@@ -803,7 +804,10 @@ export default {
           firebase.auth().currentUser.getIdToken()
           this.pullScheduled().then(events => {
             this.pulledEvents = events
-            if (this.authorized) this.updateUI(true)
+            if (this.authorized) {
+              this.updateUI(true)
+              vm.api.client.setToken({access_token:this.accessToken.toString()})
+            }
             else this.updateUI(false)
           })
         })
