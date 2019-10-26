@@ -146,7 +146,7 @@
                     class="elevation-1"
                     sort-by="start.dateTime"
                     :sort-desc="true"
-                    item-key="id"
+                    item-key="local_id"
                     :search="search"
                   ></v-data-table>
                 </v-card>
@@ -557,7 +557,7 @@
 </template>
 
 <script>
-const t0 = performance.now();
+const t0 = performance.now()
 
 // GOOGLE FIREBASE CLIENT CREDENTIALS
 const firebaseConfig = {
@@ -574,15 +574,15 @@ const firebaseConfig = {
     "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
   ],
   scopes: ["email", "profile", "https://www.googleapis.com/auth/calendar"]
-};
+}
 
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig)
 
 // FIRESTORE
-const db = firebase.firestore();
+const db = firebase.firestore()
 
 // GOOGLE FIREBASE MESSAGING
-const messaging = firebase.messaging();
+const messaging = firebase.messaging()
 
 export default {
   data() {
@@ -704,67 +704,94 @@ export default {
       push_snackbar: false,
       newNotif: "",
       newWebPush: ""
-    };
+    }
   },
 
   created() {
-    this.initMessaging();
-    this.api = gapi;
-    this.listenAndLoad();
+    this.initMessaging()
+    this.api = gapi
+    this.listenAndLoad()
   },
 
   mounted() {
-    console.log("Loaded in (sec)", performance.now() - t0);
+    console.log("Loaded in (sec)", performance.now() - t0)
   },
 
   computed: {
     events() {
-      return this.pulledEvents.length > 0 ? this.pulledEvents : [];
+      return this.pulledEvents.length > 0 ? this.pulledEvents : []
     },
     thisMonthEvents() {
       return this.events.filter(
         e => this.refDate.substr(0, 7) == e.start.dateTime.substr(0, 7)
-      );
+      )
     },
     locker() {
-      return this.locked ? "Unlock email address" : "Lock email address";
+      return this.locked ? "Unlock email address" : "Lock email address"
     }
   },
 
   methods: {
+    initMessaging() {
+      messaging.usePublicVapidKey(
+        "BJV_rKOrznrxId6JaxqYzlt7HcHjCK-c5S4062SL-dCqDtDkFs5fxifKdAtSyy3OIovPzhRC_O33reZbzBa1O6E"
+      )
+      messaging.onTokenRefresh(() => {
+        messaging
+          .getToken()
+          .then(refreshedToken => {
+            console.log("Token refreshed.")
+            this.user.token = refreshedToken
+            db.collection("swiss-wutan-subscribed")
+              .doc(this.user.gUserEmail)
+              .update({ push_token: refreshedToken })
+          })
+          .catch(err => {
+            console.log("Unable to retrieve refreshed token ", err)
+            showToken("Unable to retrieve refreshed token ", err)
+          })
+      })
+
+      messaging.onMessage(payload => {
+        this.newWebPush =
+          "NEW NOTIFICATION. " +
+          payload["notification"]["title"] +
+          "\n" +
+          payload["notification"]["body"]
+      })
+    },
+
     signIn() {
-      let provider = new firebase.auth.GoogleAuthProvider();
-      provider.addScope("profile");
-      provider.addScope("email");
-      provider.addScope("https://www.googleapis.com/auth/calendar");
+      let provider = new firebase.auth.GoogleAuthProvider()
+      provider.addScope("profile")
+      provider.addScope("email")
+      provider.addScope("https://www.googleapis.com/auth/calendar")
       firebase
         .auth()
         .signInWithPopup(provider)
         .then(result => {})
-        .catch(error => {
-          // Handle Errors here.
-        });
+        .catch(err => console.error(error))
     },
 
     listenAndLoad() {
       firebase.auth().onAuthStateChanged(firebaseUser => {
         // Make sure there is a valid user object
-        this.authorized = firebaseUser ? true : false;
+        this.authorized = firebaseUser ? true : false
         if (this.authorized) {
-          this.user.gUserEmail = firebaseUser.email;
-          this.user.name = firebaseUser.displayName;
-          this.newNotif = "Hi again, " + this.user.name;
+          this.user.gUserEmail = firebaseUser.email
+          this.user.name = firebaseUser.displayName
+          this.newNotif = "Hi again, " + this.user.name
         }
-        this.loadGapiClient();
-      });
+        this.loadGapiClient()
+      })
     },
 
     loadGapiClient() {
-      this.api.load("client:auth2", this.initClient);
+      this.api.load("client:auth2", this.initClient)
     },
 
     initClient() {
-      let vm = this;
+      let vm = this
       vm.api.client
         .init({
           apiKey: firebaseConfig.apiKey,
@@ -773,89 +800,51 @@ export default {
           scope: firebaseConfig.scopes.join(" ")
         })
         .then(() => {
-          firebase.auth().currentUser.getIdToken();
+          firebase.auth().currentUser.getIdToken()
           this.pullScheduled().then(events => {
-            this.pulledEvents = events;
-            if (this.authorized) this.updateUI(true);
-            else this.updateUI(false);
-          });
-        });
-    },
-
-    initMessaging() {
-      messaging.usePublicVapidKey(
-        "BJV_rKOrznrxId6JaxqYzlt7HcHjCK-c5S4062SL-dCqDtDkFs5fxifKdAtSyy3OIovPzhRC_O33reZbzBa1O6E"
-      );
-      messaging.onTokenRefresh(() => {
-        messaging
-          .getToken()
-          .then(refreshedToken => {
-            console.log("Token refreshed.");
-            this.user.token = refreshedToken;
-            db.collection("swiss-wutan-subscribed")
-              .doc(this.user.gUserEmail)
-              .update({ push_token: refreshedToken });
+            this.pulledEvents = events
+            if (this.authorized) this.updateUI(true)
+            else this.updateUI(false)
+            console.log(JSON.stringify(gapi.auth2.getAuthInstance().isSignedIn.get()))
           })
-          .catch(err => {
-            console.log("Unable to retrieve refreshed token ", err);
-            showToken("Unable to retrieve refreshed token ", err);
-          });
-      });
-
-      messaging.onMessage(payload => {
-        this.newWebPush =
-          "NEW NOTIFICATION. " +
-          payload["notification"]["title"] +
-          "\n" +
-          payload["notification"]["body"];
-      });
-    },
-
-    checkSignedIn() {
-      let vm = this;
-      firebase.auth().onAuthStateChanged(firebaseUser => {
-        if (firebaseUser) {
-        } else {
-          this.updateUI(false);
-        }
-      });
+        })
     },
 
     updateUI(is_authorized) {
       if (is_authorized) {
         this.pullSubmittedEvents().then(events => {
-          this.submittedEvents = events;
-          this.authorized = true;
-          this.active_tab = 0;
+          this.submittedEvents = events
+          this.authorized = true
+          this.active_tab = 0
           let userRef = db
             .collection("swiss-wutan-subscribed")
-            .doc(this.user.gUserEmail);
+            .doc(this.user.gUserEmail)
           userRef.get().then(doc => {
             if (!doc.exists)
               userRef.set({
                 email: this.user.gUserEmail,
                 created_on: firebase.firestore.FieldValue.serverTimestamp()
-              });
+              })
             else {
-              this.user.notifs_prefs = doc.data().notifs_prefs || [];
-              this.user.token = doc.data().token || "";
-              this.user.emailNotif = this.user.gUserEmail;
-              this.user.topics = doc.data().topics || [];
-              this.user.reminders = doc.data().reminders || [];
-              this.locked = true;
+              this.user.notifs_prefs = doc.data().notifs_prefs || []
+              this.user.token = doc.data().token || ""
+              this.user.emailNotif = this.user.gUserEmail
+              this.user.topics = doc.data().topics || []
+              this.user.reminders = doc.data().reminders || []
+              this.locked = true
             }
-          });
-        });
+          })
+        })
       } else {
-        this.submittedEvents = [];
-        this.authorized = false;
-        this.active_tab = 1;
+        this.submittedEvents = []
+        this.authorized = false
+        this.active_tab = 1
       }
-      this.authorized = is_authorized;
+      this.authorized = is_authorized
     },
 
     pullScheduled() {
-      const vm = this;
+      const vm = this
       return vm.api.client.calendar.events
         .list({
           calendarId: "nka6en8piao4l94h3njdl5e090@group.calendar.google.com",
@@ -876,7 +865,7 @@ export default {
               location: e.location,
               start: { dateTime: e.start.dateTime || "" },
               end: { dateTime: e.end.dateTime || "" }
-            };
+            }
             if ("attachments" in e) {
               event.attachments = [
                 {
@@ -886,11 +875,11 @@ export default {
                   iconLink: e.attachments[0].iconLink || "",
                   fileId: e.attachments[0].fileId || ""
                 }
-              ];
+              ]
             }
-            return event;
-          });
-        });
+            return event
+          })
+        })
     },
 
     // Pull submitted events from firestore
@@ -900,7 +889,7 @@ export default {
         .where("validation_status", "==", "submitted")
         .get()
         .then(snap => snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
-        .catch(err => console.log(JSON.stringify(err)));
+        .catch(err => console.log(JSON.stringify(err)))
     },
 
     // Accept or reject events
@@ -920,7 +909,7 @@ export default {
         "creator",
         "source",
         "reminders"
-      ];
+      ]
       /*const sanitize = event => {
         for (let k in event) {
           if (!gCalFields.includes(k)) delete event[k]
@@ -929,8 +918,8 @@ export default {
       }*/
       const events = this.selectedEvents.filter(
         e => e["validation_status"] === "submitted"
-      );
-      let nb_events = events.length;
+      )
+      let nb_events = events.length
 
       Promise.all(
         events.map(e =>
@@ -940,9 +929,6 @@ export default {
             .update({ validation_status: "accepted" })
         )
       )
-        .then(() => {
-          return this.gCalCheckToken();
-        })
         .then(() => {
           //events.forEach(e => {
           event = {
@@ -958,18 +944,18 @@ export default {
               dateTime: "2019-10-30T17:00:00-07:00",
               timeZone: "America/Los_Angeles"
             }
-          };
+          }
           let r = gapi.client.calendar.events.insert({
             calendarId: "3mo0a639qfhs9tjc1idmu4kkus@group.calendar.google.com",
             resource: event
-          });
+          })
           try {
             r.execute(e => {
-              console.log("created this");
-              this.updateUI(this.authorized);
-            });
+              console.log("created this")
+              this.updateUI(this.authorized)
+            })
           } catch (err) {
-            console.log("This error occurred", err);
+            console.log("This error occurred", err)
           }
           //})
         })
@@ -977,24 +963,24 @@ export default {
           () => (this.newNotif = nb_events.toString() + " event(s) accepted!")
         )
         .catch(err => {
-          console.error("This went wrong", err);
-          this.newNotif = "Something went wrong. Please get in touch.";
-        });
+          console.error("This went wrong", err)
+          this.newNotif = "Something went wrong. Please get in touch."
+        })
     },
 
     getAttachment(i) {
       return "attachments" in this.events[i]
         ? this.events[i]["attachments"][0]["fileUrl"]
-        : "";
+        : ""
     },
 
     sendRejection() {
-      console.log("rejected");
+      console.log("rejected")
     },
 
     // Little hack for iframe component refresh
     refreshFrame() {
-      this.iframe_key += 1;
+      this.iframe_key += 1
     },
 
     // FIX ME : TALK TO DATABASE
@@ -1015,27 +1001,27 @@ export default {
           topics: this.topics,
           submitted_by: this.user.gUserEmail,
           validation_status: "submitted"
-        });
-        this.newNotif = "Event submitted!";
+        })
+        this.newNotif = "Event submitted!"
       } else {
-        this.newNotif = "Please correct the form first.";
+        this.newNotif = "Please correct the form first."
       }
     },
 
     reset() {
-      this.$refs.form.reset();
+      this.$refs.form.reset()
     },
 
     resetValidation() {
-      this.$refs.form.resetValidation();
+      this.$refs.form.resetValidation()
     },
 
     lockUnlock() {
-      this.locked ? (this.locked = false) : (this.locked = true);
+      this.locked ? (this.locked = false) : (this.locked = true)
     },
 
     subUnsub(verdict) {
-      let email = verdict ? this.user.emailNotif : this.user.gUserEmail;
+      let email = verdict ? this.user.emailNotif : this.user.gUserEmail
       db.collection("swiss-wutan-subscribed")
         .doc(this.user.gUserEmail)
         .update({
@@ -1044,14 +1030,14 @@ export default {
           topics: this.user.topics,
           reminders: this.user.reminders
         })
-        .catch(err => (this.newNotif = "An error occurred " + err));
-      this.newNotif = "Subscription edited!";
+        .catch(err => (this.newNotif = "An error occurred " + err))
+      this.newNotif = "Subscription edited!"
     },
 
     testEmail() {
       alert(
         "To test this feature, make sure you have registered to Wutan Official and are accepting notifications via emails. Then select the submitted event above, and click the ACCEPT SUBMITTED EVENT button."
-      );
+      )
     },
 
     testPush() {
@@ -1064,38 +1050,38 @@ export default {
               if (currentToken) {
                 db.collection("swiss-wutan-subscribed")
                   .doc(this.user.gUserEmail)
-                  .update({ push_token: currentToken });
+                  .update({ push_token: currentToken })
                 setTimeout(() => {
-                  this.sendPush(currentToken);
-                }, 2000);
+                  this.sendPush(currentToken)
+                }, 2000)
                 alert(
                   "A notification will be issued after you close this window. Switch now to another tab or window to see the background notification. Or stay here to see the foreground notification."
-                );
+                )
               } else {
                 console.log(
                   "No Instance ID token available. Request permission to generate one."
-                );
-                console.log("Got this token", currentToken);
+                )
+                console.log("Got this token", currentToken)
               }
             })
             .catch(err => {
-              console.log("An error occurred while retrieving token. ", err);
-              console.error("Error retrieving Instance ID token. ", err);
-            });
+              console.log("An error occurred while retrieving token. ", err)
+              console.error("Error retrieving Instance ID token. ", err)
+            })
         } else {
-          console.log("Unable to get permission to notify.");
+          console.log("Unable to get permission to notify.")
         }
-      });
+      })
     },
 
     sendPush(token) {
       let key =
-        "AAAAnwC-2to:APA91bG4Ehb9g8Gt7vjMyqO5-S5EL8XD0ZpJaEWXpHF6wm2AusPieTcSjfvO_ya6izP7cU5L0CWV1xs3eeS-rhg0TERFowF_0QZtyYLSzMfvdyM6NRQG9ncR-oUXHg_IpO1YuNttWtYN";
+        "AAAAnwC-2to:APA91bG4Ehb9g8Gt7vjMyqO5-S5EL8XD0ZpJaEWXpHF6wm2AusPieTcSjfvO_ya6izP7cU5L0CWV1xs3eeS-rhg0TERFowF_0QZtyYLSzMfvdyM6NRQG9ncR-oUXHg_IpO1YuNttWtYN"
       let notification = {
         title: "You have the KUNG-FU!",
         body: "Yet, your journey is only beginning",
         click_action: "https://swiss-wutan-calendar-beta.netlify.com/"
-      };
+      }
 
       fetch("https://fcm.googleapis.com/fcm/send", {
         method: "POST",
@@ -1109,36 +1095,36 @@ export default {
         })
       })
         .then(function(response) {
-          console.log(response);
+          console.log(response)
         })
         .catch(function(error) {
-          console.error(error);
-        });
+          console.error(error)
+        })
     }
   },
   watch: {
     pickerDate(val) {
-      this.refDate = val;
+      this.refDate = val
     },
     newNotif(val) {
-      this.notif_snackbar = true;
+      this.notif_snackbar = true
     },
     newWebPush(val) {
-      this.push_snackbar = true;
+      this.push_snackbar = true
     }
   },
   filters: {
     filtreDates(datetime) {
-      datetime = datetime.split("T");
+      datetime = datetime.split("T")
       let date = datetime[0],
-        time = datetime[1];
-      let amj = date.split("-");
+        time = datetime[1]
+      let amj = date.split("-")
       let a = amj[0],
         m = amj[1],
-        j = amj[2];
-      let hhmm = time.slice(0, 5);
-      return j + "." + m + "." + a + " " + hhmm;
+        j = amj[2]
+      let hhmm = time.slice(0, 5)
+      return j + "." + m + "." + a + " " + hhmm
     }
   }
-};
+}
 </script>
