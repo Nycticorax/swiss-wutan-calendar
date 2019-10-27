@@ -543,7 +543,6 @@
             </v-container>
           </v-form>
         </v-card>
-        {{selectedSubmitted}}
       </v-container>
     </v-content>
     <v-snackbar v-if="newNotif" v-model="notif_snackbar">
@@ -905,19 +904,19 @@ export default {
     // Accept or reject events
     acceptSubmitted() {
       let nb_events = this.selectedSubmitted.length
-      return Promise.all(this.selectedSubmitted.map(e => db.collection("swiss-wutan-events").doc(e.id).update({ validation_status: "accepted" })))
+      Promise.all(this.selectedSubmitted.map(e => db.collection("swiss-wutan-events").doc(e.id).update({ validation_status: "accepted" })))
       .then(() => {
           if (!gapi.auth2.getAuthInstance().isSignedIn.get()) { console.error('tried to push events, but not signed in!'); return}
           return Promise.all(this.selectedSubmitted.map(e => addEvent({event:e})))
+          .then(res => {
+            console.log(res)
+            this.newNotif = nb_events.toString() + " event(s) accepted!"
+          })
+          .catch(err => {
+            console.error("This went wrong", err)
+            this.newNotif = "Something went wrong. Please get in touch."
+          })
       })
-      .then(res => {
-        console.log(res)
-        this.newNotif = nb_events.toString() + " event(s) accepted!"
-      })
-      .catch(err => {
-        console.error("This went wrong", err)
-        this.newNotif = "Something went wrong. Please get in touch."
-        })
     },
 
     getAttachment(i) {
