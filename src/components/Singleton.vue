@@ -543,6 +543,7 @@
             </v-container>
           </v-form>
         </v-card>
+        {{selectedSubmitted}}
       </v-container>
     </v-content>
     <v-snackbar v-if="newNotif" v-model="notif_snackbar">
@@ -580,6 +581,9 @@ firebase.initializeApp(firebaseConfig)
 
 // FIRESTORE
 const db = firebase.firestore()
+
+// FUNCTIONS
+const addEvent = firebase.functions().httpsCallable('addEvent')
 
 // GOOGLE FIREBASE MESSAGING
 const messaging = firebase.messaging()
@@ -729,6 +733,9 @@ export default {
     },
     locker() {
       return this.locked ? "Unlock email address" : "Lock email address"
+    },
+    selectedSubmitted() {
+      return this.selectedEvents.filter(e => e.validation_status === 'submitted')
     }
   },
 
@@ -897,78 +904,19 @@ export default {
 
     // Accept or reject events
     acceptSubmitted() {
-      const gCalFields = [
-        "status",
-        "updated",
-        "gadget",
-        "attachments",
-        "htmlLink",
-        "summary",
-        "description",
-        "location",
-        "start",
-        "end",
-        "organizer",
-        "creator",
-        "source",
-        "reminders"
-      ]
-      /*const sanitize = event => {
-        for (let k in event) {
-          if (!gCalFields.includes(k)) delete event[k]
-        }
-        return event
-      }*/
-      const events = this.selectedEvents.filter(
-        e => e["validation_status"] === "submitted"
-      )
-      let nb_events = events.length
-
-      Promise.all(
-        events.map(e =>
-          db
-            .collection("swiss-wutan-events")
-            .doc(e.id)
-            .update({ validation_status: "accepted" })
-        )
-      )
-        .then(() => {
+      let nb_events = this.selectedSubmitted.length
+      return Promise.all(this.selectedSubmitted.map(e => db.collection("swiss-wutan-events").doc(e.id).update({ validation_status: "accepted" })))
+      .then(() => {
           if (!gapi.auth2.getAuthInstance().isSignedIn.get()) { console.error('tried to push events, but not signed in!'); return}
-          //events.forEach(e => {
-          event = {
-            summary: "Google I/O 2015",
-            location: "800 Howard St., San Francisco, CA 94103",
-            description:
-              "A chance to hear more about Google's developer products.",
-            start: {
-              dateTime: "2019-10-30T09:00:00-07:00",
-              timeZone: "America/Los_Angeles"
-            },
-            end: {
-              dateTime: "2019-10-30T17:00:00-07:00",
-              timeZone: "America/Los_Angeles"
-            }
-          }
-          let r = gapi.client.calendar.events.insert({
-            calendarId: "nka6en8piao4l94h3njdl5e090@group.calendar.google.com",
-            resource: event
-          })
-          try {
-            r.execute(e => {
-              console.log("created this")
-              this.updateUI(this.authorized)
-            })
-          } catch (err) {
-            console.log("This error occurred", err)
-          }
-          //})
-        })
-        .then(
-          () => (this.newNotif = nb_events.toString() + " event(s) accepted!")
-        )
-        .catch(err => {
-          console.error("This went wrong", err)
-          this.newNotif = "Something went wrong. Please get in touch."
+          return Promise.all(this.selectedSubmitted.map(e => addEvent({event:e})))
+      })
+      .then(res => {
+        console.log(res)
+        this.newNotif = nb_events.toString() + " event(s) accepted!"
+      })
+      .catch(err => {
+        console.error("This went wrong", err)
+        this.newNotif = "Something went wrong. Please get in touch."
         })
     },
 
