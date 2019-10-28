@@ -236,17 +236,11 @@
             anyone on
             the internet -- no credentials required. Events which are accepted using the form just above will show up there. Also, remember that Google Calendars have many
             features (independently of this very web app). The point of this web app is to provide a more fine-grained control over what gets in the Google Calendar, and to offer a better user interface.
+            <p><v-btn @click="refreshFrame()">Reload</v-btn> if you've added new events to see them appear here.</p>
           </v-card-text>
           <v-card class="d-flex pa-2" outlined tile>
             <div :key="iframe_key">
-              <iframe
-                src="https://calendar.google.com/calendar/embed?height=600&ampwkst=2&ampbgcolor=%23D50000&ampctz=Europe%2FZurich&ampsrc=bmthNmVuOHBpYW80bDk0aDNuamRsNWUwOTBAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&ampcolor=%23A79B8E&ampshowTz=0&ampshowCalendars=0&ampshowTabs=0&ampshowPrint=0&amphl=de&ampshowNav=0&ampshowTitle=0&ampmode=AGENDA"
-                style="border-width:0"
-                width="450"
-                height="450"
-                frameborder="0"
-                scrolling="no"
-              ></iframe>
+              <iframe src="https://calendar.google.com/calendar/embed?height=500&amp;wkst=2&amp;bgcolor=%23D50000&amp;ctz=Europe%2FZurich&amp;src=bmthNmVuOHBpYW80bDk0aDNuamRsNWUwOTBAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23D50000&amp;showTitle=1&amp;showNav=1&amp;showDate=1&amp;showPrint=0&amp;showCalendars=0&amp;showTz=0&amp;hl=en_GB" style="border-width:0" width="800" height="500" frameborder="0" scrolling="no"></iframe>
             </div>
           </v-card>
         </v-card>
