@@ -780,6 +780,14 @@ export default {
         .catch(err => console.error(error))
     },
 
+    signOut() {
+      firebase.auth().signOut().then(() => {
+        console.log('Signed out gracefully')
+      }).catch(function(error) {
+        console.error('Trying to sign out, then this error occurred', error)
+      })
+    },
+
     listenAndLoad() {
       firebase.auth().onAuthStateChanged(firebaseUser => {
         // Make sure there is a valid user object
