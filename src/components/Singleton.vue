@@ -914,7 +914,7 @@ export default {
       let nb_events = this.selectedSubmitted.length
       Promise.all(this.selectedSubmitted.map(e => db.collection("swiss-wutan-events").doc(e.id).update({ validation_status: "accepted" })))
       .then(() => {
-          if (!gapi.auth2.getAuthInstance().isSignedIn.get()) { console.error('tried to push events, but not signed in!'); return}
+          //if (!gapi.auth2.getAuthInstance().isSignedIn.get()) { console.error('tried to push events, but not signed in!'); return}
           return Promise.all(this.selectedSubmitted.map(e => addEvent({event:e})))
           .then(res => {
             console.log(res)
