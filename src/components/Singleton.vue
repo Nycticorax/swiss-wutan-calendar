@@ -81,8 +81,10 @@
           </v-toolbar>
           <v-card class="d-flex pa-2" outlined tile>
             <v-card-actions>
+            <div id="firebaseui-auth-container">
               <v-btn v-if="!authorized" @click="signIn()">Log in</v-btn>
               <v-btn v-else @click="signOut()">Log out</v-btn>
+            </div>
             </v-card-actions>
             <v-card-text>
               Acquire admin credentials here. Please note that you will need a Google Account
@@ -763,15 +765,22 @@ export default {
     },
 
     signIn() {
-      let provider = new firebase.auth.GoogleAuthProvider()
-      provider.addScope("profile")
-      provider.addScope("email")
-      provider.addScope("https://www.googleapis.com/auth/calendar")
-      firebase
-        .auth()
-        .signInWithPopup(provider)
-        .then(result => this.accessToken = result.credential.accessToken)
-        .catch(err => console.error(error))
+      const ui = new firebaseui.auth.AuthUI(firebase.auth())
+      ui.start('#firebaseui-auth-container', {
+        callbacks: {
+          cb: (result, redirect) => {
+            this.accessToken = result.credential.accessToken
+            return true
+          }
+        },
+        signInOptions: [
+          // List of OAuth providers supported.
+          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+          firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+        ],
+        signInFlow: 'popup'
+      })
     },
 
     signOut() {
