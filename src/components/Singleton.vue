@@ -779,7 +779,7 @@ export default {
           firebase.auth.FacebookAuthProvider.PROVIDER_ID,
           firebase.auth.TwitterAuthProvider.PROVIDER_ID,
         ],
-        signInFlow: 'popup'
+        signInFlow: 'popup' 
       })
     },
 
