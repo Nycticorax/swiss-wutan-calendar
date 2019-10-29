@@ -912,7 +912,7 @@ export default {
           return Promise.all(this.selectedSubmitted.map(e => addEvent({event:e})))
           .then(res => {
             console.log(res)
-            this.newNotif = nb_events.toString() + " event(s) accepted!"
+            this.newNotif = nb_events.toString() + " event(s) accepted! Please *REFRESH* the page or *RELOAD* the Google Calendar below to see it/them."
           })
           .catch(err => {
             console.error("This went wrong", err)
