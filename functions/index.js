@@ -103,7 +103,7 @@ function sendEmail(addressees_emails, summary) {
     return mailTransport.sendMail(mailOptions)
 }
 
-exports.notifySubscribed = functions.firestore.document('swiss-wutan-events/{event}').onUpdate((change, context) => {
+exports.notifySubscribed = functions.regions('europe-west1').firestore.document('swiss-wutan-events/{event}').onUpdate((change, context) => {
     // upon an event updated to 'accepted', sends emails and / or web push notifications to all whose topics intersect topics of the event
     const newData = change.after.data();
     const oldData = change.before.data();
@@ -120,7 +120,7 @@ exports.notifySubscribed = functions.firestore.document('swiss-wutan-events/{eve
 
 })
 
-exports.addEvent = functions.https.onCall((data, context) => {
+exports.addEvent = functions.regions('europe-west1').https.onCall((data, context) => {
     // upon acceptance in client, adds data.event to Google Cal
     const oAuth2Client = new OAuth2(
         googleCredentials.web.client_id,
