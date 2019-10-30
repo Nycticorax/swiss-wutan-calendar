@@ -576,7 +576,7 @@ firebase.initializeApp(firebaseConfig)
 const db = firebase.firestore()
 
 // FUNCTIONS
-const addEvent = firebase.functions().httpsCallable('addEvent')
+const addEvent = firebase.functions('europe-west1').httpsCallable('addEvent')
 
 // GOOGLE FIREBASE MESSAGING
 const messaging = firebase.messaging()
